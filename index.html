@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foreign-born population by U.S. county</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb; }
+    #app { display: flex; height: 100vh; }
+
+    #sidebar {
+      width: 270px;
+      flex-shrink: 0;
+      background: #1f2937;
+      border-right: 1px solid #374151;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #sidebar-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid #374151;
+    }
+    h1 { font-size: 15px; font-weight: 700; line-height: 1.3; color: #f9fafb; }
+    .subtitle { font-size: 11px; color: #6b7280; margin-top: 3px; }
+
+    #mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-top: 12px;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 7px 6px;
+      font-size: 11px;
+      background: transparent;
+      color: #9ca3af;
+      border: none;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+    .mode-btn + .mode-btn { border-left: 1px solid #374151; }
+    .mode-btn:hover { background: #374151; color: #f3f4f6; }
+    .mode-btn.active { background: #3b82f6; color: #fff; }
+    .mode-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .mode-btn:disabled:hover { background: transparent; color: #9ca3af; }
+
+    #search-wrap {
+      position: relative;
+      margin: 12px 12px 0;
+    }
+    #search-input {
+      width: 100%;
+      padding: 7px 10px;
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 5px;
+      color: #f3f4f6;
+      font-size: 12.5px;
+      font-family: inherit;
+    }
+    #search-input::placeholder { color: #6b7280; }
+    #search-input:focus { outline: none; border-color: #3b82f6; }
+    #search-results {
+      position: absolute;
+      top: 100%;
+      left: 0; right: 0;
+      margin-top: 2px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 5px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 1100;
+      display: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+    .search-item {
+      padding: 7px 10px;
+      font-size: 12.5px;
+      color: #d1d5db;
+      cursor: pointer;
+      border-bottom: 1px solid #2d3748;
+    }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: #374151; color: #fff; }
+
+    #sidebar-scroll { flex: 1; overflow-y: auto; padding: 12px 12px 20px; }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin: 14px 0 6px;
+    }
+    .section-label:first-child { margin-top: 2px; }
+
+    .country-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 6px 9px;
+      margin-bottom: 2px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      color: #d1d5db;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .country-btn:hover { background: #374151; color: #f3f4f6; }
+    .country-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+    #sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid #374151;
+    }
+    .legend-label { font-size: 10px; color: #6b7280; margin-bottom: 6px; }
+    .legend-gradient {
+      height: 10px;
+      border-radius: 2px;
+      margin-bottom: 4px;
+    }
+    .legend-ticks { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-bottom: 10px; }
+    .data-note { font-size: 10px; color: #4b5563; line-height: 1.5; }
+
+    #map { flex: 1; }
+
+    #tooltip {
+      position: fixed;
+      background: rgba(17, 24, 39, 0.96);
+      border: 1px solid #374151;
+      border-radius: 7px;
+      padding: 10px 13px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 9999;
+      display: none;
+      min-width: 180px;
+      max-width: 230px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    #tooltip .tt-name { font-weight: 700; font-size: 13px; color: #f9fafb; margin-bottom: 7px; line-height: 1.2; }
+    #tooltip .tt-row { color: #9ca3af; margin-bottom: 3px; }
+    #tooltip .tt-row span { color: #e5e7eb; font-weight: 600; }
+    #tooltip .tt-highlight { color: #93c5fd; font-weight: 700; font-size: 14px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #374151; }
+    #tooltip .tt-top { margin-top: 8px; padding-top: 7px; border-top: 1px solid #374151; }
+    #tooltip .tt-top-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; margin-bottom: 4px; }
+    #tooltip .tt-top-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #d1d5db; line-height: 1.5; }
+    #tooltip .tt-top-row span { color: #9ca3af; font-weight: 500; }
+    #tooltip .tt-top-row .tt-rank { color: #6b7280; width: 14px; flex-shrink: 0; }
+    #tooltip .tt-top-row .tt-cname { flex: 1; color: #e5e7eb; }
+    .pulse-county {
+      stroke: #fbbf24 !important;
+      stroke-width: 2.5 !important;
+      stroke-opacity: 1 !important;
+    }
+
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #111827;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #374151;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-msg { color: #9ca3af; font-size: 13px; }
+    #loading-err { color: #f87171; font-size: 13px; text-align: center; max-width: 340px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p id="loading-msg">Loading Census data...</p>
+  <p id="loading-err" style="display:none"></p>
+</div>
+
+<div id="app">
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <h1>Foreign-born population by U.S. county</h1>
+      <p class="subtitle">ACS 5-year estimates, 2022 &mdash; U.S. Census Bureau</p>
+      <div id="mode-toggle">
+        <button class="mode-btn active" id="mode-pop" data-mode="pop">% of population</button>
+        <button class="mode-btn" id="mode-fb" data-mode="fb" disabled>% of foreign-born</button>
+      </div>
+    </div>
+
+    <div id="search-wrap">
+      <input id="search-input" type="text" placeholder="Search county or state..." autocomplete="off" spellcheck="false">
+      <div id="search-results"></div>
+    </div>
+
+    <div id="sidebar-scroll">
+      <div class="section-label">Show immigrants from</div>
+      <button class="country-btn active" data-var="ALL" data-label="All countries">All countries</button>
+
+      <div class="section-label">Americas</div>
+      <button class="country-btn" data-var="B05006_160E" data-label="Mexico">Mexico</button>
+      <button class="country-btn" data-var="B05006_158E" data-label="Guatemala">Guatemala</button>
+      <button class="country-btn" data-var="B05006_157E" data-label="El Salvador">El Salvador</button>
+      <button class="country-btn" data-var="B05006_159E" data-label="Honduras">Honduras</button>
+      <button class="country-btn" data-var="B05006_143E" data-label="Cuba">Cuba</button>
+      <button class="country-btn" data-var="B05006_145E" data-label="Dominican Republic">Dominican Republic</button>
+      <button class="country-btn" data-var="B05006_147E" data-label="Haiti">Haiti</button>
+      <button class="country-btn" data-var="B05006_148E" data-label="Jamaica">Jamaica</button>
+      <button class="country-btn" data-var="B05006_169E" data-label="Colombia">Colombia</button>
+      <button class="country-btn" data-var="B05006_170E" data-label="Ecuador">Ecuador</button>
+      <button class="country-btn" data-var="B05006_172E" data-label="Peru">Peru</button>
+      <button class="country-btn" data-var="B05006_167E" data-label="Brazil">Brazil</button>
+      <button class="country-btn" data-var="B05006_174E" data-label="Venezuela">Venezuela</button>
+      <button class="country-btn" data-var="B05006_177E" data-label="Canada">Canada</button>
+
+      <div class="section-label">Asia</div>
+      <button class="country-btn" data-var="B05006_060E" data-label="India">India</button>
+      <button class="country-btn" data-var="B05006_050E" data-label="China (excl. HK & Taiwan)">China</button>
+      <button class="country-btn" data-var="B05006_074E" data-label="Philippines">Philippines</button>
+      <button class="country-btn" data-var="B05006_077E" data-label="Vietnam">Vietnam</button>
+      <button class="country-btn" data-var="B05006_054E" data-label="Korea">Korea</button>
+      <button class="country-btn" data-var="B05006_061E" data-label="Iran">Iran</button>
+      <button class="country-btn" data-var="B05006_064E" data-label="Pakistan">Pakistan</button>
+      <button class="country-btn" data-var="B05006_058E" data-label="Bangladesh">Bangladesh</button>
+      <button class="country-btn" data-var="B05006_063E" data-label="Nepal">Nepal</button>
+      <button class="country-btn" data-var="B05006_069E" data-label="Myanmar (Burma)">Myanmar (Burma)</button>
+
+      <div class="section-label">Europe</div>
+      <button class="country-btn" data-var="B05006_044E" data-label="Ukraine">Ukraine</button>
+      <button class="country-btn" data-var="B05006_042E" data-label="Russia">Russia</button>
+      <button class="country-btn" data-var="B05006_040E" data-label="Poland">Poland</button>
+      <button class="country-btn" data-var="B05006_017E" data-label="Germany">Germany</button>
+      <button class="country-btn" data-var="B05006_008E" data-label="United Kingdom">United Kingdom</button>
+      <button class="country-btn" data-var="B05006_023E" data-label="Italy">Italy</button>
+
+      <div class="section-label">Africa</div>
+      <button class="country-btn" data-var="B05006_124E" data-label="Nigeria">Nigeria</button>
+      <button class="country-btn" data-var="B05006_098E" data-label="Ethiopia">Ethiopia</button>
+      <button class="country-btn" data-var="B05006_099E" data-label="Kenya">Kenya</button>
+      <button class="country-btn" data-var="B05006_121E" data-label="Ghana">Ghana</button>
+    </div>
+
+    <div id="sidebar-footer">
+      <div class="legend-label" id="legend-label">% of county population that is foreign-born</div>
+      <div class="legend-gradient" id="legend-bar"></div>
+      <div class="legend-ticks">
+        <span>0%</span>
+        <span id="legend-mid"></span>
+        <span id="legend-max"></span>
+      </div>
+      <div class="data-note">
+        Source: ACS 5-year estimates (2022). Shown as share of total county population.
+        Small-county estimates may be unreliable.
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-row">Total population: <span id="tt-pop"></span></div>
+  <div class="tt-row">All foreign-born: <span id="tt-foreign"></span> (<span id="tt-pct-all"></span>)</div>
+  <div class="tt-highlight" id="tt-country-block" style="display:none">
+    From <span id="tt-clabel"></span>:<br>
+    <span id="tt-ccount"></span> &mdash; <span id="tt-cpct"></span>
+  </div>
+  <div class="tt-top" id="tt-top-block">
+    <div class="tt-top-label">Top origin countries</div>
+    <div id="tt-top-list"></div>
+  </div>
+</div>
+
+<script>
+// Optional: add your Census API key from https://api.census.gov/data/key_signup.html
+const CENSUS_KEY = '';
+
+const COUNTRY_VARS = [
+  'B05006_160E','B05006_158E','B05006_157E','B05006_159E',
+  'B05006_143E','B05006_145E','B05006_147E','B05006_148E',
+  'B05006_169E','B05006_170E','B05006_172E','B05006_167E',
+  'B05006_174E','B05006_177E',
+  'B05006_060E','B05006_050E','B05006_074E','B05006_077E',
+  'B05006_054E','B05006_061E','B05006_064E','B05006_058E',
+  'B05006_063E','B05006_069E',
+  'B05006_044E','B05006_042E','B05006_040E','B05006_017E',
+  'B05006_008E','B05006_023E',
+  'B05006_124E','B05006_098E','B05006_099E','B05006_121E',
+];
+
+let countyData = {};
+let currentVar = 'ALL';
+let currentLabel = 'All countries';
+let viewMode = 'pop'; // 'pop' = % of total population; 'fb' = % of foreign-born (only with country)
+let geoLayer = null;
+let layerByFips = {};
+let dynamicMax = 30;
+
+// Build label lookup from sidebar buttons (populated after DOM parses)
+const VAR_LABEL = {};
+
+// ----- map setup -----
+const map = L.map('map', { center: [38.5, -97], zoom: 4, zoomSnap: 0.5, preferCanvas: true });
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 19,
+}).addTo(map);
+
+// labels pane on top
+const labelsPane = map.createPane('labels');
+labelsPane.style.zIndex = 650;
+labelsPane.style.pointerEvents = 'none';
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19, pane: 'labels',
+}).addTo(map);
+
+// ----- color -----
+function makeColor(pct) {
+  if (pct === null || isNaN(pct)) return '#1f2937';
+  const t = Math.min(pct / dynamicMax, 1);
+  return d3.interpolateBlues(0.08 + t * 0.92);
+}
+
+function updateLegend() {
+  const mid = (dynamicMax / 2).toFixed(1).replace('.0','');
+  const max = dynamicMax;
+  document.getElementById('legend-mid').textContent = mid + '%';
+  document.getElementById('legend-max').textContent = max + '%+';
+
+  const stops = d3.range(0, 1.01, 0.1).map(t => d3.interpolateBlues(0.08 + t * 0.92));
+  document.getElementById('legend-bar').style.background =
+    `linear-gradient(to right, ${stops.join(', ')})`;
+}
+
+// ----- compute -----
+function getPct(fips) {
+  const d = countyData[fips];
+  if (!d) return null;
+  if (currentVar === 'ALL') {
+    if (!d.pop || d.pop <= 0) return null;
+    if (d.foreign === null || d.foreign < 0) return null;
+    return (d.foreign / d.pop) * 100;
+  }
+  const n = d[currentVar];
+  if (n === null || n < 0) return null;
+  if (viewMode === 'fb') {
+    if (!d.foreign || d.foreign <= 0) return null;
+    return (n / d.foreign) * 100;
+  }
+  if (!d.pop || d.pop <= 0) return null;
+  return (n / d.pop) * 100;
+}
+
+function refreshMax() {
+  const vals = Object.keys(countyData).map(f => getPct(f)).filter(v => v !== null && v > 0);
+  if (!vals.length) { dynamicMax = currentVar === 'ALL' ? 30 : 5; return; }
+  const p95 = d3.quantile(vals.sort(d3.ascending), 0.95);
+  dynamicMax = Math.max(Math.ceil(p95 / 2) * 2, 1);
+}
+
+// ----- update map -----
+function updateMap() {
+  refreshMax();
+  updateLegend();
+  if (!geoLayer) return;
+  geoLayer.setStyle(f => styleFeature(f));
+}
+
+function styleFeature(feature) {
+  const fips = String(feature.id).padStart(5, '0');
+  return {
+    fillColor: makeColor(getPct(fips)),
+    fillOpacity: 0.85,
+    color: '#111827',
+    weight: 0.4,
+    opacity: 0.6,
+  };
+}
+
+// ----- tooltip -----
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(e, feature) {
+  const fips = String(feature.id).padStart(5, '0');
+  const d = countyData[fips];
+  if (!d) return;
+
+  const pctAll = d.pop > 0 && d.foreign >= 0 ? ((d.foreign / d.pop) * 100).toFixed(1) + '%' : 'N/A';
+  document.getElementById('tt-name').textContent = d.name;
+  document.getElementById('tt-pop').textContent = d.pop ? d.pop.toLocaleString() : 'N/A';
+  document.getElementById('tt-foreign').textContent = d.foreign >= 0 ? d.foreign.toLocaleString() : 'N/A';
+  document.getElementById('tt-pct-all').textContent = pctAll;
+
+  const cb = document.getElementById('tt-country-block');
+  if (currentVar !== 'ALL') {
+    const n = d[currentVar];
+    let cpct = 'N/A';
+    if (n >= 0) {
+      if (viewMode === 'fb' && d.foreign > 0) {
+        cpct = ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born';
+      } else if (d.pop > 0) {
+        cpct = ((n / d.pop) * 100).toFixed(2) + '% of population';
+      }
+    }
+    document.getElementById('tt-clabel').textContent = currentLabel;
+    document.getElementById('tt-ccount').textContent = n >= 0 ? n.toLocaleString() : 'N/A';
+    document.getElementById('tt-cpct').textContent = cpct;
+    cb.style.display = 'block';
+  } else {
+    cb.style.display = 'none';
+  }
+
+  // top-5 origin countries
+  const topList = document.getElementById('tt-top-list');
+  const topBlock = document.getElementById('tt-top-block');
+  if (d.foreign > 0) {
+    const ranked = COUNTRY_VARS
+      .map(v => ({ v, n: d[v] }))
+      .filter(o => o.n > 0)
+      .sort((a, b) => b.n - a.n)
+      .slice(0, 5);
+    if (ranked.length) {
+      topList.innerHTML = ranked.map((o, i) => {
+        const share = ((o.n / d.foreign) * 100).toFixed(0);
+        return `<div class="tt-top-row">
+          <span class="tt-rank">${i+1}.</span>
+          <span class="tt-cname">${VAR_LABEL[o.v] || o.v}</span>
+          <span>${o.n.toLocaleString()} <span style="color:#6b7280">(${share}%)</span></span>
+        </div>`;
+      }).join('');
+      topBlock.style.display = 'block';
+    } else {
+      topBlock.style.display = 'none';
+    }
+  } else {
+    topBlock.style.display = 'none';
+  }
+
+  tooltip.style.display = 'block';
+  positionTooltip(e);
+}
+
+function positionTooltip(e) {
+  const oe = e.originalEvent || e;
+  const x = oe.clientX, y = oe.clientY;
+  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  tooltip.style.left = (x + 18 + tw > vw ? x - tw - 10 : x + 18) + 'px';
+  tooltip.style.top  = (y + th + 10 > vh ? y - th - 5  : y + 10) + 'px';
+}
+
+// ----- data fetch -----
+async function loadCensusData() {
+  const vars = ['NAME', 'B05002_001E', 'B05006_001E', ...COUNTRY_VARS].join(',');
+  const key = CENSUS_KEY ? `&key=${CENSUS_KEY}` : '';
+  const url = `https://api.census.gov/data/2022/acs/acs5?get=${vars}&for=county:*&in=state:*${key}`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Census API returned ${res.status}`);
+  const rows = await res.json();
+
+  const headers = rows[0];
+  const result = {};
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    const fips = row[headers.indexOf('state')] + row[headers.indexOf('county')];
+    const obj = { name: row[headers.indexOf('NAME')] };
+    obj.pop     = +row[headers.indexOf('B05002_001E')] || 0;
+    obj.foreign = +row[headers.indexOf('B05006_001E')];
+    if (isNaN(obj.foreign)) obj.foreign = -1;
+    COUNTRY_VARS.forEach(v => {
+      const val = +row[headers.indexOf(v)];
+      obj[v] = isNaN(val) ? -1 : val;
+    });
+    result[fips] = obj;
+  }
+  return result;
+}
+
+// ----- legend label -----
+function updateLegendLabel() {
+  const el = document.getElementById('legend-label');
+  if (currentVar === 'ALL') {
+    el.textContent = '% of county population that is foreign-born';
+  } else if (viewMode === 'fb') {
+    el.textContent = `% of foreign-born from ${currentLabel}`;
+  } else {
+    el.textContent = `% of population born in ${currentLabel}`;
+  }
+}
+
+// ----- country buttons -----
+document.querySelectorAll('.country-btn').forEach(btn => {
+  VAR_LABEL[btn.dataset.var] = btn.dataset.label;
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentVar = btn.dataset.var;
+    currentLabel = btn.dataset.label;
+
+    const fbBtn = document.getElementById('mode-fb');
+    if (currentVar === 'ALL') {
+      fbBtn.disabled = true;
+      if (viewMode === 'fb') {
+        viewMode = 'pop';
+        document.getElementById('mode-pop').classList.add('active');
+        fbBtn.classList.remove('active');
+      }
+    } else {
+      fbBtn.disabled = false;
+    }
+
+    updateLegendLabel();
+    updateMap();
+  });
+});
+
+// ----- view-mode toggle -----
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.disabled) return;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    viewMode = btn.dataset.mode;
+    updateLegendLabel();
+    updateMap();
+  });
+});
+
+// ----- county search -----
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+function runSearch(q) {
+  q = q.trim().toLowerCase();
+  if (q.length < 2) { searchResults.style.display = 'none'; return; }
+  const matches = [];
+  for (const fips in countyData) {
+    if (countyData[fips].name.toLowerCase().includes(q)) {
+      matches.push({ fips, name: countyData[fips].name });
+      if (matches.length >= 30) break;
+    }
+  }
+  if (!matches.length) {
+    searchResults.innerHTML = '<div class="search-item" style="color:#6b7280">No matches</div>';
+    searchResults.style.display = 'block';
+    return;
+  }
+  searchResults.innerHTML = matches.map(m =>
+    `<div class="search-item" data-fips="${m.fips}">${m.name}</div>`
+  ).join('');
+  searchResults.style.display = 'block';
+  searchResults.querySelectorAll('.search-item').forEach(el => {
+    el.addEventListener('click', () => goToCounty(el.dataset.fips));
+  });
+}
+
+function goToCounty(fips) {
+  searchResults.style.display = 'none';
+  searchInput.value = countyData[fips].name;
+  const layer = layerByFips[fips];
+  if (!layer) return;
+  const bounds = layer.getBounds();
+  map.fitBounds(bounds, { maxZoom: 9, padding: [20, 20] });
+  // pulse highlight
+  const path = layer._path;
+  if (path) {
+    path.classList.add('pulse-county');
+    setTimeout(() => path.classList.remove('pulse-county'), 2200);
+  }
+}
+
+searchInput.addEventListener('input', e => runSearch(e.target.value));
+searchInput.addEventListener('focus', e => { if (e.target.value) runSearch(e.target.value); });
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-wrap').contains(e.target)) {
+    searchResults.style.display = 'none';
+  }
+});
+
+// ----- init -----
+(async () => {
+  try {
+    document.getElementById('loading-msg').textContent = 'Loading Census data...';
+
+    const [data, topo] = await Promise.all([
+      loadCensusData(),
+      fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(r => r.json()),
+    ]);
+    countyData = data;
+
+    const geojson = topojson.feature(topo, topo.objects.counties);
+
+    geoLayer = L.geoJSON(geojson, {
+      style: styleFeature,
+      onEachFeature: (feature, layer) => {
+        const fips = String(feature.id).padStart(5, '0');
+        layerByFips[fips] = layer;
+        layer.on({
+          mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
+          mouseout:  () => { tooltip.style.display = 'none'; },
+          click:     e => showTooltip(e, feature),
+        });
+      },
+    }).addTo(map);
+
+    updateMap();
+    document.getElementById('loading').style.display = 'none';
+
+  } catch (err) {
+    console.error(err);
+    document.querySelector('.spinner').style.display = 'none';
+    document.getElementById('loading-msg').style.display = 'none';
+    const errEl = document.getElementById('loading-err');
+    errEl.style.display = 'block';
+    errEl.innerHTML = `<strong>Could not load data.</strong><br>${err.message}<br><br>
+      <small>The Census API may be rate-limiting. Try refreshing, or add a free API key at
+      <a href="https://api.census.gov/data/key_signup.html" style="color:#93c5fd" target="_blank">api.census.gov</a>
+      and paste it into the CENSUS_KEY variable at the top of the script.</small>`;
+  }
+})();
+</script>
+</body>
+</html>
