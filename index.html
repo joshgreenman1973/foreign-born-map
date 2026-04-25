@@ -93,7 +93,64 @@
     .search-item:last-child { border-bottom: none; }
     .search-item:hover { background: #374151; color: #fff; }
 
-    #sidebar-scroll { flex: 1; overflow-y: auto; padding: 12px 12px 20px; }
+    #sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 12px 20px; }
+
+    #tabs {
+      display: flex;
+      gap: 0;
+      margin: 12px 0 6px;
+      border-bottom: 1px solid #374151;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 6px;
+      font-size: 11.5px;
+      background: transparent;
+      color: #6b7280;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.12s, border-color 0.12s;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    .tab-btn:hover { color: #d1d5db; }
+    .tab-btn.active { color: #93c5fd; border-bottom-color: #3b82f6; }
+
+    .tab-pane { display: none; padding-top: 6px; }
+    .tab-pane.active { display: block; }
+
+    #top-counties-header {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin: 6px 0 8px;
+      line-height: 1.4;
+    }
+    .top-county {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      gap: 8px;
+      padding: 6px 8px;
+      margin-bottom: 1px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: background 0.1s;
+      align-items: baseline;
+    }
+    .top-county:hover { background: #374151; }
+    .top-county .tc-rank { color: #6b7280; font-variant-numeric: tabular-nums; }
+    .top-county .tc-name { color: #e5e7eb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-county .tc-stat { color: #93c5fd; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; }
+    .top-county.hover-active { background: #1e3a8a; }
+
+    .hover-county {
+      stroke: #fbbf24 !important;
+      stroke-width: 2 !important;
+      stroke-opacity: 1 !important;
+    }
 
     .section-label {
       font-size: 10px;
@@ -217,6 +274,17 @@
     </div>
 
     <div id="sidebar-scroll">
+      <div id="tabs">
+        <button class="tab-btn active" data-tab="countries">By country</button>
+        <button class="tab-btn" data-tab="top">Top counties</button>
+      </div>
+
+      <div id="tab-top" class="tab-pane">
+        <div id="top-counties-header">Top 50 counties &mdash; <span id="tc-mode-label">all foreign-born</span></div>
+        <div id="top-counties-list"></div>
+      </div>
+
+      <div id="tab-countries" class="tab-pane active">
       <div class="section-label">Show immigrants from</div>
       <button class="country-btn active" data-var="ALL" data-label="All countries">All countries</button>
 
@@ -261,6 +329,7 @@
       <button class="country-btn" data-var="B05006_098E" data-label="Ethiopia">Ethiopia</button>
       <button class="country-btn" data-var="B05006_099E" data-label="Kenya">Kenya</button>
       <button class="country-btn" data-var="B05006_121E" data-label="Ghana">Ghana</button>
+      </div>
     </div>
 
     <div id="sidebar-footer">
@@ -537,6 +606,67 @@ document.querySelectorAll('.country-btn').forEach(btn => {
 
     updateLegendLabel();
     updateMap();
+    if (document.getElementById('tab-top').classList.contains('active')) buildTopCountiesList();
+  });
+});
+
+// ----- top counties list -----
+function buildTopCountiesList() {
+  const list = document.getElementById('top-counties-list');
+  const label = document.getElementById('tc-mode-label');
+
+  const isAll = currentVar === 'ALL';
+  label.textContent = isAll ? 'all foreign-born' : currentLabel;
+
+  const entries = [];
+  for (const fips in countyData) {
+    const d = countyData[fips];
+    const n = isAll ? d.foreign : d[currentVar];
+    if (n > 0) entries.push({ fips, d, n });
+  }
+  entries.sort((a, b) => b.n - a.n);
+  const top = entries.slice(0, 50);
+
+  list.innerHTML = top.map((e, i) => {
+    const denom = (!isAll && viewMode === 'fb') ? e.d.foreign : e.d.pop;
+    const pct = denom > 0 ? ((e.n / denom) * 100) : 0;
+    const pctStr = pct >= 10 ? pct.toFixed(0) + '%' : pct.toFixed(1) + '%';
+    return `<div class="top-county" data-fips="${e.fips}">
+      <span class="tc-rank">${i+1}.</span>
+      <span class="tc-name" title="${e.d.name}">${e.d.name}</span>
+      <span class="tc-stat" title="${e.n.toLocaleString()} people">${pctStr}</span>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.top-county').forEach(el => {
+    const fips = el.dataset.fips;
+    el.addEventListener('mouseenter', () => highlightCounty(fips, true));
+    el.addEventListener('mouseleave', () => highlightCounty(fips, false));
+    el.addEventListener('click', () => goToCounty(fips));
+  });
+}
+
+function highlightCounty(fips, on) {
+  const layer = layerByFips[fips];
+  if (!layer) return;
+  const path = layer._path;
+  if (!path) return;
+  if (on) {
+    path.classList.add('hover-county');
+    path.parentNode && path.parentNode.appendChild(path); // bring to front
+  } else {
+    path.classList.remove('hover-county');
+  }
+}
+
+// ----- tabs -----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'top') buildTopCountiesList();
   });
 });
 
@@ -549,6 +679,7 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     viewMode = btn.dataset.mode;
     updateLegendLabel();
     updateMap();
+    if (document.getElementById('tab-top').classList.contains('active')) buildTopCountiesList();
   });
 });
 
