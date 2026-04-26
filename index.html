@@ -14,7 +14,7 @@
     #app { display: flex; height: 100vh; }
 
     #sidebar {
-      width: 270px;
+      width: 320px;
       flex-shrink: 0;
       background: #1f2937;
       border-right: 1px solid #374151;
@@ -23,18 +23,42 @@
       overflow: hidden;
     }
     #sidebar-header {
-      padding: 16px 16px 12px;
+      padding: 16px 16px 14px;
       border-bottom: 1px solid #374151;
     }
     h1 { font-size: 15px; font-weight: 700; line-height: 1.3; color: #f9fafb; }
     .subtitle { font-size: 11px; color: #6b7280; margin-top: 3px; }
 
+    #country-select-wrap {
+      margin-top: 12px;
+    }
+    #country-select-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 5px;
+    }
+    #country-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 5px;
+      color: #f3f4f6;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    #country-select:focus { outline: none; border-color: #3b82f6; }
+    #country-select optgroup { color: #6b7280; font-style: normal; font-weight: 600; }
+    #country-select option { color: #f3f4f6; background: #111827; }
+
     #mode-toggle {
       display: flex;
-      gap: 0;
-      margin-top: 12px;
+      margin-top: 10px;
       border: 1px solid #374151;
-      border-radius: 6px;
+      border-radius: 5px;
       overflow: hidden;
     }
     .mode-btn {
@@ -46,6 +70,7 @@
       border: none;
       cursor: pointer;
       transition: background 0.12s, color 0.12s;
+      font-family: inherit;
     }
     .mode-btn + .mode-btn { border-left: 1px solid #374151; }
     .mode-btn:hover { background: #374151; color: #f3f4f6; }
@@ -55,7 +80,7 @@
 
     #search-wrap {
       position: relative;
-      margin: 12px 12px 0;
+      margin: 10px 16px 0;
     }
     #search-input {
       width: 100%;
@@ -71,13 +96,12 @@
     #search-input:focus { outline: none; border-color: #3b82f6; }
     #search-results {
       position: absolute;
-      top: 100%;
-      left: 0; right: 0;
+      top: 100%; left: 0; right: 0;
       margin-top: 2px;
       background: #1f2937;
       border: 1px solid #374151;
       border-radius: 5px;
-      max-height: 220px;
+      max-height: 240px;
       overflow-y: auto;
       z-index: 1100;
       display: none;
@@ -95,44 +119,21 @@
 
     #sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 12px 20px; }
 
-    #tabs {
-      display: flex;
-      gap: 0;
-      margin: 12px 0 6px;
-      border-bottom: 1px solid #374151;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 8px 6px;
-      font-size: 11.5px;
-      background: transparent;
-      color: #6b7280;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      transition: color 0.12s, border-color 0.12s;
-      font-family: inherit;
-      font-weight: 500;
-    }
-    .tab-btn:hover { color: #d1d5db; }
-    .tab-btn.active { color: #93c5fd; border-bottom-color: #3b82f6; }
-
-    .tab-pane { display: none; padding-top: 6px; }
-    .tab-pane.active { display: block; }
-
-    #top-counties-header {
+    #top-counties-section { margin-top: 12px; }
+    .tc-header {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: #6b7280;
-      margin: 6px 0 8px;
-      line-height: 1.4;
+      margin: 14px 0 6px;
+      padding: 0 4px;
     }
+    .tc-header:first-child { margin-top: 4px; }
     .top-county {
       display: grid;
-      grid-template-columns: 18px 1fr auto;
+      grid-template-columns: 22px 1fr auto;
       gap: 8px;
-      padding: 6px 8px;
+      padding: 5px 8px;
       margin-bottom: 1px;
       border-radius: 4px;
       font-size: 11.5px;
@@ -143,56 +144,22 @@
     .top-county:hover { background: #374151; }
     .top-county .tc-rank { color: #6b7280; font-variant-numeric: tabular-nums; }
     .top-county .tc-name { color: #e5e7eb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .top-county .tc-stat { color: #93c5fd; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; }
-    .top-county.hover-active { background: #1e3a8a; }
-
-    .hover-county {
-      stroke: #fbbf24 !important;
-      stroke-width: 2 !important;
-      stroke-opacity: 1 !important;
-    }
-
-    .section-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6b7280;
-      margin: 14px 0 6px;
-    }
-    .section-label:first-child { margin-top: 2px; }
-
-    .country-btn {
-      display: block;
-      width: 100%;
-      text-align: left;
-      padding: 6px 9px;
-      margin-bottom: 2px;
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 5px;
-      color: #d1d5db;
-      font-size: 12.5px;
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .country-btn:hover { background: #374151; color: #f3f4f6; }
-    .country-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .top-county .tc-stat { color: #93c5fd; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; text-align: right; }
+    .top-county .tc-stat .tc-pct { color: #6b7280; font-weight: 500; margin-left: 4px; }
 
     #sidebar-footer {
       padding: 12px 16px;
       border-top: 1px solid #374151;
     }
-    .legend-label { font-size: 10px; color: #6b7280; margin-bottom: 6px; }
+    .legend-label { font-size: 10px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4; }
     .legend-gradient {
       height: 10px;
       border-radius: 2px;
       margin-bottom: 4px;
     }
-    .legend-ticks { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-bottom: 10px; }
+    .legend-ticks { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
     .data-note { font-size: 10px; color: #4b5563; line-height: 1.5; }
+    .data-note a { color: #6b7280; }
 
     #map { flex: 1; }
 
@@ -206,8 +173,8 @@
       pointer-events: none;
       z-index: 9999;
       display: none;
-      min-width: 180px;
-      max-width: 230px;
+      min-width: 200px;
+      max-width: 250px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     #tooltip .tt-name { font-weight: 700; font-size: 13px; color: #f9fafb; margin-bottom: 7px; line-height: 1.2; }
@@ -217,23 +184,25 @@
     #tooltip .tt-top { margin-top: 8px; padding-top: 7px; border-top: 1px solid #374151; }
     #tooltip .tt-top-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; margin-bottom: 4px; }
     #tooltip .tt-top-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #d1d5db; line-height: 1.5; }
-    #tooltip .tt-top-row span { color: #9ca3af; font-weight: 500; }
     #tooltip .tt-top-row .tt-rank { color: #6b7280; width: 14px; flex-shrink: 0; }
     #tooltip .tt-top-row .tt-cname { flex: 1; color: #e5e7eb; }
-    .pulse-county {
-      stroke: #fbbf24 !important;
+
+    .hover-county {
+      stroke: #f472b6 !important;
       stroke-width: 2.5 !important;
+      stroke-opacity: 1 !important;
+    }
+    .pulse-county {
+      stroke: #f472b6 !important;
+      stroke-width: 3 !important;
       stroke-opacity: 1 !important;
     }
 
     #loading {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: #111827;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       z-index: 9999;
     }
     .spinner {
@@ -246,7 +215,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading-msg { color: #9ca3af; font-size: 13px; }
-    #loading-err { color: #f87171; font-size: 13px; text-align: center; max-width: 340px; line-height: 1.5; }
+    #loading-err { color: #f87171; font-size: 13px; text-align: center; max-width: 360px; line-height: 1.5; padding: 0 20px; }
   </style>
 </head>
 <body>
@@ -261,10 +230,14 @@
   <div id="sidebar">
     <div id="sidebar-header">
       <h1>Foreign-born population by U.S. county</h1>
-      <p class="subtitle">ACS 5-year estimates, 2022 &mdash; U.S. Census Bureau</p>
+      <p class="subtitle">ACS 5-year estimates &mdash; <span id="data-year">2024</span> &mdash; U.S. Census Bureau</p>
+      <div id="country-select-wrap">
+        <div id="country-select-label">Show immigrants from</div>
+        <select id="country-select"></select>
+      </div>
       <div id="mode-toggle">
-        <button class="mode-btn active" id="mode-pop" data-mode="pop">% of population</button>
-        <button class="mode-btn" id="mode-fb" data-mode="fb" disabled>% of foreign-born</button>
+        <button class="mode-btn active" data-mode="pop">% of population</button>
+        <button class="mode-btn" data-mode="fb" disabled>% of foreign-born</button>
       </div>
     </div>
 
@@ -274,75 +247,18 @@
     </div>
 
     <div id="sidebar-scroll">
-      <div id="tabs">
-        <button class="tab-btn active" data-tab="countries">By country</button>
-        <button class="tab-btn" data-tab="top">Top counties</button>
-      </div>
-
-      <div id="tab-top" class="tab-pane">
-        <div id="top-counties-header">Top 50 counties &mdash; <span id="tc-mode-label">all foreign-born</span></div>
-        <div id="top-counties-list"></div>
-      </div>
-
-      <div id="tab-countries" class="tab-pane active">
-      <div class="section-label">Show immigrants from</div>
-      <button class="country-btn active" data-var="ALL" data-label="All countries">All countries</button>
-
-      <div class="section-label">Americas</div>
-      <button class="country-btn" data-var="B05006_160E" data-label="Mexico">Mexico</button>
-      <button class="country-btn" data-var="B05006_158E" data-label="Guatemala">Guatemala</button>
-      <button class="country-btn" data-var="B05006_157E" data-label="El Salvador">El Salvador</button>
-      <button class="country-btn" data-var="B05006_159E" data-label="Honduras">Honduras</button>
-      <button class="country-btn" data-var="B05006_143E" data-label="Cuba">Cuba</button>
-      <button class="country-btn" data-var="B05006_145E" data-label="Dominican Republic">Dominican Republic</button>
-      <button class="country-btn" data-var="B05006_147E" data-label="Haiti">Haiti</button>
-      <button class="country-btn" data-var="B05006_148E" data-label="Jamaica">Jamaica</button>
-      <button class="country-btn" data-var="B05006_169E" data-label="Colombia">Colombia</button>
-      <button class="country-btn" data-var="B05006_170E" data-label="Ecuador">Ecuador</button>
-      <button class="country-btn" data-var="B05006_172E" data-label="Peru">Peru</button>
-      <button class="country-btn" data-var="B05006_167E" data-label="Brazil">Brazil</button>
-      <button class="country-btn" data-var="B05006_174E" data-label="Venezuela">Venezuela</button>
-      <button class="country-btn" data-var="B05006_177E" data-label="Canada">Canada</button>
-
-      <div class="section-label">Asia</div>
-      <button class="country-btn" data-var="B05006_060E" data-label="India">India</button>
-      <button class="country-btn" data-var="B05006_050E" data-label="China (excl. HK & Taiwan)">China</button>
-      <button class="country-btn" data-var="B05006_074E" data-label="Philippines">Philippines</button>
-      <button class="country-btn" data-var="B05006_077E" data-label="Vietnam">Vietnam</button>
-      <button class="country-btn" data-var="B05006_054E" data-label="Korea">Korea</button>
-      <button class="country-btn" data-var="B05006_061E" data-label="Iran">Iran</button>
-      <button class="country-btn" data-var="B05006_064E" data-label="Pakistan">Pakistan</button>
-      <button class="country-btn" data-var="B05006_058E" data-label="Bangladesh">Bangladesh</button>
-      <button class="country-btn" data-var="B05006_063E" data-label="Nepal">Nepal</button>
-      <button class="country-btn" data-var="B05006_069E" data-label="Myanmar (Burma)">Myanmar (Burma)</button>
-
-      <div class="section-label">Europe</div>
-      <button class="country-btn" data-var="B05006_044E" data-label="Ukraine">Ukraine</button>
-      <button class="country-btn" data-var="B05006_042E" data-label="Russia">Russia</button>
-      <button class="country-btn" data-var="B05006_040E" data-label="Poland">Poland</button>
-      <button class="country-btn" data-var="B05006_017E" data-label="Germany">Germany</button>
-      <button class="country-btn" data-var="B05006_008E" data-label="United Kingdom">United Kingdom</button>
-      <button class="country-btn" data-var="B05006_023E" data-label="Italy">Italy</button>
-
-      <div class="section-label">Africa</div>
-      <button class="country-btn" data-var="B05006_124E" data-label="Nigeria">Nigeria</button>
-      <button class="country-btn" data-var="B05006_098E" data-label="Ethiopia">Ethiopia</button>
-      <button class="country-btn" data-var="B05006_099E" data-label="Kenya">Kenya</button>
-      <button class="country-btn" data-var="B05006_121E" data-label="Ghana">Ghana</button>
-      </div>
+      <div id="top-counties-section"></div>
     </div>
 
     <div id="sidebar-footer">
       <div class="legend-label" id="legend-label">% of county population that is foreign-born</div>
       <div class="legend-gradient" id="legend-bar"></div>
-      <div class="legend-ticks">
-        <span>0%</span>
-        <span id="legend-mid"></span>
-        <span id="legend-max"></span>
+      <div class="legend-ticks" id="legend-ticks">
+        <span>0%</span><span></span><span></span>
       </div>
       <div class="data-note">
-        Source: ACS 5-year estimates (2022). Shown as share of total county population.
-        Small-county estimates may be unreliable.
+        Source: U.S. Census Bureau, ACS 5-year. Color scale uses quantile bins for visual contrast.
+        Small-county estimates may have wide margins of error.
       </div>
     </div>
   </div>
@@ -365,42 +281,169 @@
 </div>
 
 <script>
-// Optional: add your Census API key from https://api.census.gov/data/key_signup.html
 const CENSUS_KEY = '';
+const ACS_YEAR = '2024';
 
-const COUNTRY_VARS = [
-  'B05006_160E','B05006_158E','B05006_157E','B05006_159E',
-  'B05006_143E','B05006_145E','B05006_147E','B05006_148E',
-  'B05006_169E','B05006_170E','B05006_172E','B05006_167E',
-  'B05006_174E','B05006_177E',
-  'B05006_060E','B05006_050E','B05006_074E','B05006_077E',
-  'B05006_054E','B05006_061E','B05006_064E','B05006_058E',
-  'B05006_063E','B05006_069E',
-  'B05006_044E','B05006_042E','B05006_040E','B05006_017E',
-  'B05006_008E','B05006_023E',
-  'B05006_124E','B05006_098E','B05006_099E','B05006_121E',
+// Country list grouped by region. Each entry: [varCode, displayName]
+const REGIONS = [
+  ['Americas', [
+    ['B05006_160E', 'Mexico'],
+    ['B05006_158E', 'Guatemala'],
+    ['B05006_157E', 'El Salvador'],
+    ['B05006_159E', 'Honduras'],
+    ['B05006_156E', 'Costa Rica'],
+    ['B05006_155E', 'Belize'],
+    ['B05006_161E', 'Nicaragua'],
+    ['B05006_162E', 'Panama'],
+    ['B05006_143E', 'Cuba'],
+    ['B05006_145E', 'Dominican Republic'],
+    ['B05006_147E', 'Haiti'],
+    ['B05006_148E', 'Jamaica'],
+    ['B05006_141E', 'Bahamas'],
+    ['B05006_142E', 'Barbados'],
+    ['B05006_146E', 'Grenada'],
+    ['B05006_149E', 'St. Lucia'],
+    ['B05006_150E', 'St. Vincent & Grenadines'],
+    ['B05006_151E', 'Trinidad & Tobago'],
+    ['B05006_165E', 'Argentina'],
+    ['B05006_166E', 'Bolivia'],
+    ['B05006_167E', 'Brazil'],
+    ['B05006_168E', 'Chile'],
+    ['B05006_169E', 'Colombia'],
+    ['B05006_170E', 'Ecuador'],
+    ['B05006_171E', 'Guyana'],
+    ['B05006_172E', 'Peru'],
+    ['B05006_173E', 'Uruguay'],
+    ['B05006_174E', 'Venezuela'],
+    ['B05006_177E', 'Canada'],
+  ]],
+  ['Asia', [
+    ['B05006_049E', 'China'],
+    ['B05006_053E', 'Japan'],
+    ['B05006_054E', 'Korea'],
+    ['B05006_060E', 'India'],
+    ['B05006_064E', 'Pakistan'],
+    ['B05006_058E', 'Bangladesh'],
+    ['B05006_063E', 'Nepal'],
+    ['B05006_065E', 'Sri Lanka'],
+    ['B05006_059E', 'Bhutan'],
+    ['B05006_062E', 'Kazakhstan'],
+    ['B05006_066E', 'Uzbekistan'],
+    ['B05006_057E', 'Afghanistan'],
+    ['B05006_061E', 'Iran'],
+    ['B05006_074E', 'Philippines'],
+    ['B05006_077E', 'Vietnam'],
+    ['B05006_069E', 'Burma (Myanmar)'],
+    ['B05006_070E', 'Cambodia'],
+    ['B05006_071E', 'Indonesia'],
+    ['B05006_072E', 'Laos'],
+    ['B05006_073E', 'Malaysia'],
+    ['B05006_075E', 'Singapore'],
+    ['B05006_076E', 'Thailand'],
+    ['B05006_080E', 'Armenia'],
+    ['B05006_081E', 'Azerbaijan'],
+    ['B05006_082E', 'Georgia'],
+    ['B05006_083E', 'Iraq'],
+    ['B05006_084E', 'Israel'],
+    ['B05006_085E', 'Jordan'],
+    ['B05006_086E', 'Kuwait'],
+    ['B05006_087E', 'Lebanon'],
+    ['B05006_088E', 'Saudi Arabia'],
+    ['B05006_089E', 'Syria'],
+    ['B05006_090E', 'Turkey'],
+    ['B05006_091E', 'United Arab Emirates'],
+    ['B05006_092E', 'Yemen'],
+  ]],
+  ['Europe', [
+    ['B05006_044E', 'Ukraine'],
+    ['B05006_042E', 'Russia'],
+    ['B05006_040E', 'Poland'],
+    ['B05006_017E', 'Germany'],
+    ['B05006_008E', 'United Kingdom'],
+    ['B05006_005E', 'Ireland'],
+    ['B05006_023E', 'Italy'],
+    ['B05006_016E', 'France'],
+    ['B05006_018E', 'Netherlands'],
+    ['B05006_015E', 'Belgium'],
+    ['B05006_019E', 'Switzerland'],
+    ['B05006_014E', 'Austria'],
+    ['B05006_026E', 'Spain'],
+    ['B05006_024E', 'Portugal'],
+    ['B05006_022E', 'Greece'],
+    ['B05006_004E', 'Denmark'],
+    ['B05006_006E', 'Norway'],
+    ['B05006_007E', 'Sweden'],
+    ['B05006_029E', 'Albania'],
+    ['B05006_030E', 'Belarus'],
+    ['B05006_031E', 'Bosnia & Herzegovina'],
+    ['B05006_032E', 'Bulgaria'],
+    ['B05006_033E', 'Croatia'],
+    ['B05006_034E', 'Czechoslovakia (Czech & Slovakia)'],
+    ['B05006_035E', 'Hungary'],
+    ['B05006_036E', 'Latvia'],
+    ['B05006_037E', 'Lithuania'],
+    ['B05006_038E', 'Moldova'],
+    ['B05006_039E', 'North Macedonia'],
+    ['B05006_041E', 'Romania'],
+    ['B05006_043E', 'Serbia'],
+  ]],
+  ['Africa', [
+    ['B05006_124E', 'Nigeria'],
+    ['B05006_098E', 'Ethiopia'],
+    ['B05006_099E', 'Kenya'],
+    ['B05006_100E', 'Somalia'],
+    ['B05006_117E', 'South Africa'],
+    ['B05006_112E', 'Egypt'],
+    ['B05006_113E', 'Morocco'],
+    ['B05006_111E', 'Algeria'],
+    ['B05006_114E', 'Sudan'],
+    ['B05006_097E', 'Eritrea'],
+    ['B05006_101E', 'Tanzania'],
+    ['B05006_102E', 'Uganda'],
+    ['B05006_103E', 'Zimbabwe'],
+    ['B05006_106E', 'Cameroon'],
+    ['B05006_107E', 'Congo'],
+    ['B05006_108E', 'D.R. Congo'],
+    ['B05006_120E', 'Cabo Verde'],
+    ['B05006_121E', 'Ghana'],
+    ['B05006_122E', 'Ivory Coast'],
+    ['B05006_123E', 'Liberia'],
+    ['B05006_125E', 'Senegal'],
+    ['B05006_126E', 'Sierra Leone'],
+    ['B05006_127E', 'Togo'],
+  ]],
+  ['Oceania', [
+    ['B05006_132E', 'Australia'],
+    ['B05006_134E', 'Fiji'],
+    ['B05006_135E', 'Marshall Islands'],
+    ['B05006_136E', 'Micronesia'],
+  ]],
 ];
 
+// Flatten + label lookup
+const COUNTRY_VARS = [];
+const VAR_LABEL = {};
+REGIONS.forEach(([region, list]) => list.forEach(([v, name]) => {
+  COUNTRY_VARS.push(v);
+  VAR_LABEL[v] = name;
+}));
+
+// State
 let countyData = {};
 let currentVar = 'ALL';
 let currentLabel = 'All countries';
-let viewMode = 'pop'; // 'pop' = % of total population; 'fb' = % of foreign-born (only with country)
+let viewMode = 'pop';
 let geoLayer = null;
 let layerByFips = {};
-let dynamicMax = 30;
-
-// Build label lookup from sidebar buttons (populated after DOM parses)
-const VAR_LABEL = {};
+let colorScale = null;
+let breakValues = [];
 
 // ----- map setup -----
 const map = L.map('map', { center: [38.5, -97], zoom: 4, zoomSnap: 0.5, preferCanvas: true });
-
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>',
   subdomains: 'abcd', maxZoom: 19,
 }).addTo(map);
-
-// labels pane on top
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = 650;
 labelsPane.style.pointerEvents = 'none';
@@ -408,26 +451,53 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
   subdomains: 'abcd', maxZoom: 19, pane: 'labels',
 }).addTo(map);
 
-// ----- color -----
-function makeColor(pct) {
-  if (pct === null || isNaN(pct)) return '#1f2937';
-  const t = Math.min(pct / dynamicMax, 1);
-  return d3.interpolateBlues(0.08 + t * 0.92);
+// ----- color scale (quantile) -----
+// Viridis: perceptually uniform, colorblind-friendly, editorially neutral
+const COLOR_STOPS = (() => {
+  const stops = [];
+  for (let i = 0; i < 10; i++) stops.push(d3.interpolateViridis(0.05 + (i / 9) * 0.92));
+  return stops;
+})();
+function buildColorScale() {
+  const vals = Object.keys(countyData)
+    .map(f => getRawPct(f))
+    .filter(v => v !== null && v > 0);
+  if (!vals.length) {
+    breakValues = [];
+    colorScale = () => '#1f2937';
+    return;
+  }
+  vals.sort(d3.ascending);
+  const n = COLOR_STOPS.length;
+  breakValues = [];
+  for (let i = 1; i < n; i++) {
+    breakValues.push(d3.quantile(vals, i / n));
+  }
+  colorScale = (v) => {
+    if (v === null || isNaN(v)) return '#1f2937';
+    let idx = 0;
+    for (let i = 0; i < breakValues.length; i++) {
+      if (v <= breakValues[i]) { idx = i; break; }
+      idx = i + 1;
+    }
+    return COLOR_STOPS[idx];
+  };
 }
 
 function updateLegend() {
-  const mid = (dynamicMax / 2).toFixed(1).replace('.0','');
-  const max = dynamicMax;
-  document.getElementById('legend-mid').textContent = mid + '%';
-  document.getElementById('legend-max').textContent = max + '%+';
-
-  const stops = d3.range(0, 1.01, 0.1).map(t => d3.interpolateBlues(0.08 + t * 0.92));
   document.getElementById('legend-bar').style.background =
-    `linear-gradient(to right, ${stops.join(', ')})`;
+    `linear-gradient(to right, ${COLOR_STOPS.join(',')})`;
+  const ticks = document.getElementById('legend-ticks');
+  if (!breakValues.length) { ticks.innerHTML = '<span>0%</span><span></span><span></span>'; return; }
+  const fmt = v => v >= 10 ? v.toFixed(0) + '%' : v.toFixed(1) + '%';
+  const lo = 0;
+  const mid = breakValues[Math.floor(breakValues.length / 2)];
+  const hi = breakValues[breakValues.length - 1];
+  ticks.innerHTML = `<span>${fmt(lo)}</span><span>${fmt(mid)}</span><span>${fmt(hi)}+</span>`;
 }
 
 // ----- compute -----
-function getPct(fips) {
+function getRawPct(fips) {
   const d = countyData[fips];
   if (!d) return null;
   if (currentVar === 'ALL') {
@@ -436,7 +506,7 @@ function getPct(fips) {
     return (d.foreign / d.pop) * 100;
   }
   const n = d[currentVar];
-  if (n === null || n < 0) return null;
+  if (n === null || n === undefined || n < 0) return null;
   if (viewMode === 'fb') {
     if (!d.foreign || d.foreign <= 0) return null;
     return (n / d.foreign) * 100;
@@ -445,37 +515,105 @@ function getPct(fips) {
   return (n / d.pop) * 100;
 }
 
-function refreshMax() {
-  const vals = Object.keys(countyData).map(f => getPct(f)).filter(v => v !== null && v > 0);
-  if (!vals.length) { dynamicMax = currentVar === 'ALL' ? 30 : 5; return; }
-  const p95 = d3.quantile(vals.sort(d3.ascending), 0.95);
-  dynamicMax = Math.max(Math.ceil(p95 / 2) * 2, 1);
-}
-
-// ----- update map -----
-function updateMap() {
-  refreshMax();
-  updateLegend();
-  if (!geoLayer) return;
-  geoLayer.setStyle(f => styleFeature(f));
-}
-
+// ----- map render -----
 function styleFeature(feature) {
-  const fips = String(feature.id).padStart(5, '0');
+  const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
   return {
-    fillColor: makeColor(getPct(fips)),
-    fillOpacity: 0.85,
-    color: '#111827',
+    fillColor: colorScale ? colorScale(getRawPct(fips)) : '#1f2937',
+    fillOpacity: 0.88,
+    color: '#0b1220',
     weight: 0.4,
     opacity: 0.6,
   };
+}
+
+function updateMap() {
+  buildColorScale();
+  updateLegend();
+  if (geoLayer) geoLayer.setStyle(styleFeature);
+}
+
+// ----- legend label -----
+function updateLegendLabel() {
+  const el = document.getElementById('legend-label');
+  if (currentVar === 'ALL') {
+    el.textContent = '% of county population that is foreign-born';
+  } else if (viewMode === 'fb') {
+    el.textContent = `% of foreign-born from ${currentLabel}`;
+  } else {
+    el.textContent = `% of population born in ${currentLabel}`;
+  }
+}
+
+// ----- top counties -----
+function buildTopCountiesList() {
+  const container = document.getElementById('top-counties-section');
+  const isAll = currentVar === 'ALL';
+
+  const entries = [];
+  for (const fips in countyData) {
+    const d = countyData[fips];
+    const n = isAll ? d.foreign : d[currentVar];
+    if (n > 0 && d.pop > 50) entries.push({ fips, d, n });
+  }
+  entries.sort((a, b) => b.n - a.n);
+
+  let html = '';
+
+  if (isAll) {
+    const top50 = entries.slice(0, 50);
+    const bottom50 = entries.slice(-50).reverse();
+    html += `<div class="tc-header">Top 50 counties &mdash; most foreign-born</div>`;
+    html += renderRows(top50, 1);
+    html += `<div class="tc-header">Bottom 50 counties (with any foreign-born)</div>`;
+    html += renderRows(bottom50, 1);
+  } else {
+    const top25 = entries.slice(0, 25);
+    html += `<div class="tc-header">Top 25 counties &mdash; ${currentLabel}-born</div>`;
+    html += renderRows(top25, 1);
+  }
+
+  container.innerHTML = html;
+  container.querySelectorAll('.top-county').forEach(el => {
+    const fips = el.dataset.fips;
+    el.addEventListener('mouseenter', () => highlightCounty(fips, true));
+    el.addEventListener('mouseleave', () => highlightCounty(fips, false));
+    el.addEventListener('click', () => goToCounty(fips));
+  });
+}
+
+function renderRows(arr, startRank) {
+  const isAll = currentVar === 'ALL';
+  return arr.map((e, i) => {
+    const denom = (!isAll && viewMode === 'fb') ? e.d.foreign : e.d.pop;
+    const pct = denom > 0 ? ((e.n / denom) * 100) : 0;
+    const pctStr = pct >= 10 ? pct.toFixed(0) + '%' : pct.toFixed(1) + '%';
+    const countStr = e.n.toLocaleString();
+    return `<div class="top-county" data-fips="${e.fips}">
+      <span class="tc-rank">${startRank + i}.</span>
+      <span class="tc-name" title="${e.d.name}">${e.d.name}</span>
+      <span class="tc-stat">${countStr}<span class="tc-pct">${pctStr}</span></span>
+    </div>`;
+  }).join('');
+}
+
+function highlightCounty(fips, on) {
+  const layer = layerByFips[fips];
+  if (!layer || !layer._path) return;
+  const p = layer._path;
+  if (on) {
+    p.classList.add('hover-county');
+    p.parentNode && p.parentNode.appendChild(p);
+  } else {
+    p.classList.remove('hover-county');
+  }
 }
 
 // ----- tooltip -----
 const tooltip = document.getElementById('tooltip');
 
 function showTooltip(e, feature) {
-  const fips = String(feature.id).padStart(5, '0');
+  const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
   const d = countyData[fips];
   if (!d) return;
 
@@ -490,11 +628,8 @@ function showTooltip(e, feature) {
     const n = d[currentVar];
     let cpct = 'N/A';
     if (n >= 0) {
-      if (viewMode === 'fb' && d.foreign > 0) {
-        cpct = ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born';
-      } else if (d.pop > 0) {
-        cpct = ((n / d.pop) * 100).toFixed(2) + '% of population';
-      }
+      if (viewMode === 'fb' && d.foreign > 0) cpct = ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born';
+      else if (d.pop > 0) cpct = ((n / d.pop) * 100).toFixed(2) + '% of population';
     }
     document.getElementById('tt-clabel').textContent = currentLabel;
     document.getElementById('tt-ccount').textContent = n >= 0 ? n.toLocaleString() : 'N/A';
@@ -504,7 +639,6 @@ function showTooltip(e, feature) {
     cb.style.display = 'none';
   }
 
-  // top-5 origin countries
   const topList = document.getElementById('tt-top-list');
   const topBlock = document.getElementById('tt-top-block');
   if (d.foreign > 0) {
@@ -519,16 +653,12 @@ function showTooltip(e, feature) {
         return `<div class="tt-top-row">
           <span class="tt-rank">${i+1}.</span>
           <span class="tt-cname">${VAR_LABEL[o.v] || o.v}</span>
-          <span>${o.n.toLocaleString()} <span style="color:#6b7280">(${share}%)</span></span>
+          <span style="color:#9ca3af">${o.n.toLocaleString()} <span style="color:#6b7280">(${share}%)</span></span>
         </div>`;
       }).join('');
       topBlock.style.display = 'block';
-    } else {
-      topBlock.style.display = 'none';
-    }
-  } else {
-    topBlock.style.display = 'none';
-  }
+    } else { topBlock.style.display = 'none'; }
+  } else { topBlock.style.display = 'none'; }
 
   tooltip.style.display = 'block';
   positionTooltip(e);
@@ -544,133 +674,97 @@ function positionTooltip(e) {
 }
 
 // ----- data fetch -----
-async function loadCensusData() {
-  const vars = ['NAME', 'B05002_001E', 'B05006_001E', ...COUNTRY_VARS].join(',');
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+async function fetchOneBatch(vars) {
+  const get = ['NAME', ...vars].join(',');
   const key = CENSUS_KEY ? `&key=${CENSUS_KEY}` : '';
-  const url = `https://api.census.gov/data/2022/acs/acs5?get=${vars}&for=county:*&in=state:*${key}`;
-
+  const url = `https://api.census.gov/data/${ACS_YEAR}/acs/acs5?get=${get}&for=county:*&in=state:*${key}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Census API returned ${res.status}`);
-  const rows = await res.json();
+  if (!res.ok) throw new Error(`Census API ${res.status}`);
+  return res.json();
+}
 
-  const headers = rows[0];
-  const result = {};
-  for (let i = 1; i < rows.length; i++) {
-    const row = rows[i];
-    const fips = row[headers.indexOf('state')] + row[headers.indexOf('county')];
-    const obj = { name: row[headers.indexOf('NAME')] };
-    obj.pop     = +row[headers.indexOf('B05002_001E')] || 0;
-    obj.foreign = +row[headers.indexOf('B05006_001E')];
-    if (isNaN(obj.foreign)) obj.foreign = -1;
+async function loadCensusData() {
+  // Always-needed vars first batch (3 base) + remaining country vars, split into chunks of <=46 vars
+  const baseVars = ['B05002_001E', 'B05006_001E'];
+  const allVars = [...baseVars, ...COUNTRY_VARS]; // 96 vars
+  const batches = chunk(allVars, 46);
+
+  const results = await Promise.all(batches.map(fetchOneBatch));
+  const merged = {};
+
+  results.forEach(rows => {
+    const headers = rows[0];
+    const stateIdx = headers.indexOf('state');
+    const countyIdx = headers.indexOf('county');
+    const nameIdx = headers.indexOf('NAME');
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      const fips = r[stateIdx] + r[countyIdx];
+      if (!merged[fips]) merged[fips] = { name: r[nameIdx] };
+      headers.forEach((h, j) => {
+        if (h === 'NAME' || h === 'state' || h === 'county') return;
+        const v = +r[j];
+        merged[fips][h] = isNaN(v) ? -1 : v;
+      });
+    }
+  });
+
+  // Normalize keys
+  const out = {};
+  for (const fips in merged) {
+    const m = merged[fips];
+    out[fips] = {
+      name: m.name,
+      pop: m['B05002_001E'] || 0,
+      foreign: m['B05006_001E'] !== undefined ? m['B05006_001E'] : -1,
+    };
     COUNTRY_VARS.forEach(v => {
-      const val = +row[headers.indexOf(v)];
-      obj[v] = isNaN(val) ? -1 : val;
+      out[fips][v] = m[v] !== undefined ? m[v] : -1;
     });
-    result[fips] = obj;
   }
-  return result;
+  return out;
 }
 
-// ----- legend label -----
-function updateLegendLabel() {
-  const el = document.getElementById('legend-label');
-  if (currentVar === 'ALL') {
-    el.textContent = '% of county population that is foreign-born';
-  } else if (viewMode === 'fb') {
-    el.textContent = `% of foreign-born from ${currentLabel}`;
-  } else {
-    el.textContent = `% of population born in ${currentLabel}`;
-  }
-}
-
-// ----- country buttons -----
-document.querySelectorAll('.country-btn').forEach(btn => {
-  VAR_LABEL[btn.dataset.var] = btn.dataset.label;
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.country-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentVar = btn.dataset.var;
-    currentLabel = btn.dataset.label;
-
-    const fbBtn = document.getElementById('mode-fb');
+// ----- country dropdown -----
+function buildCountryDropdown() {
+  const sel = document.getElementById('country-select');
+  let html = '<option value="ALL">All foreign-born (any country)</option>';
+  REGIONS.forEach(([region, list]) => {
+    const sorted = [...list].sort((a, b) => a[1].localeCompare(b[1]));
+    html += `<optgroup label="${region}">`;
+    sorted.forEach(([v, name]) => {
+      html += `<option value="${v}">${name}</option>`;
+    });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+  sel.addEventListener('change', () => {
+    currentVar = sel.value;
     if (currentVar === 'ALL') {
+      currentLabel = 'All countries';
+      const fbBtn = document.querySelector('.mode-btn[data-mode="fb"]');
       fbBtn.disabled = true;
       if (viewMode === 'fb') {
         viewMode = 'pop';
-        document.getElementById('mode-pop').classList.add('active');
-        fbBtn.classList.remove('active');
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'pop'));
       }
     } else {
-      fbBtn.disabled = false;
+      currentLabel = VAR_LABEL[currentVar];
+      document.querySelector('.mode-btn[data-mode="fb"]').disabled = false;
     }
-
     updateLegendLabel();
     updateMap();
-    if (document.getElementById('tab-top').classList.contains('active')) buildTopCountiesList();
-  });
-});
-
-// ----- top counties list -----
-function buildTopCountiesList() {
-  const list = document.getElementById('top-counties-list');
-  const label = document.getElementById('tc-mode-label');
-
-  const isAll = currentVar === 'ALL';
-  label.textContent = isAll ? 'all foreign-born' : currentLabel;
-
-  const entries = [];
-  for (const fips in countyData) {
-    const d = countyData[fips];
-    const n = isAll ? d.foreign : d[currentVar];
-    if (n > 0) entries.push({ fips, d, n });
-  }
-  entries.sort((a, b) => b.n - a.n);
-  const top = entries.slice(0, 50);
-
-  list.innerHTML = top.map((e, i) => {
-    const denom = (!isAll && viewMode === 'fb') ? e.d.foreign : e.d.pop;
-    const pct = denom > 0 ? ((e.n / denom) * 100) : 0;
-    const pctStr = pct >= 10 ? pct.toFixed(0) + '%' : pct.toFixed(1) + '%';
-    return `<div class="top-county" data-fips="${e.fips}">
-      <span class="tc-rank">${i+1}.</span>
-      <span class="tc-name" title="${e.d.name}">${e.d.name}</span>
-      <span class="tc-stat" title="${e.n.toLocaleString()} people">${pctStr}</span>
-    </div>`;
-  }).join('');
-
-  list.querySelectorAll('.top-county').forEach(el => {
-    const fips = el.dataset.fips;
-    el.addEventListener('mouseenter', () => highlightCounty(fips, true));
-    el.addEventListener('mouseleave', () => highlightCounty(fips, false));
-    el.addEventListener('click', () => goToCounty(fips));
+    buildTopCountiesList();
   });
 }
 
-function highlightCounty(fips, on) {
-  const layer = layerByFips[fips];
-  if (!layer) return;
-  const path = layer._path;
-  if (!path) return;
-  if (on) {
-    path.classList.add('hover-county');
-    path.parentNode && path.parentNode.appendChild(path); // bring to front
-  } else {
-    path.classList.remove('hover-county');
-  }
-}
-
-// ----- tabs -----
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'top') buildTopCountiesList();
-  });
-});
-
-// ----- view-mode toggle -----
+// ----- mode toggle -----
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     if (btn.disabled) return;
@@ -679,11 +773,11 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     viewMode = btn.dataset.mode;
     updateLegendLabel();
     updateMap();
-    if (document.getElementById('tab-top').classList.contains('active')) buildTopCountiesList();
+    buildTopCountiesList();
   });
 });
 
-// ----- county search -----
+// ----- search -----
 const searchInput = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
 
@@ -703,8 +797,7 @@ function runSearch(q) {
     return;
   }
   searchResults.innerHTML = matches.map(m =>
-    `<div class="search-item" data-fips="${m.fips}">${m.name}</div>`
-  ).join('');
+    `<div class="search-item" data-fips="${m.fips}">${m.name}</div>`).join('');
   searchResults.style.display = 'block';
   searchResults.querySelectorAll('.search-item').forEach(el => {
     el.addEventListener('click', () => goToCounty(el.dataset.fips));
@@ -713,16 +806,15 @@ function runSearch(q) {
 
 function goToCounty(fips) {
   searchResults.style.display = 'none';
-  searchInput.value = countyData[fips].name;
   const layer = layerByFips[fips];
   if (!layer) return;
   const bounds = layer.getBounds();
   map.fitBounds(bounds, { maxZoom: 9, padding: [20, 20] });
-  // pulse highlight
-  const path = layer._path;
-  if (path) {
-    path.classList.add('pulse-county');
-    setTimeout(() => path.classList.remove('pulse-county'), 2200);
+  const p = layer._path;
+  if (p) {
+    p.classList.add('pulse-county');
+    p.parentNode && p.parentNode.appendChild(p);
+    setTimeout(() => p.classList.remove('pulse-county'), 2200);
   }
 }
 
@@ -735,34 +827,35 @@ document.addEventListener('click', e => {
 });
 
 // ----- init -----
+buildCountryDropdown();
+
 (async () => {
   try {
-    document.getElementById('loading-msg').textContent = 'Loading Census data...';
-
+    document.getElementById('data-year').textContent = ACS_YEAR;
     const [data, topo] = await Promise.all([
       loadCensusData(),
-      fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(r => r.json()),
+      fetch('counties-2022.topojson').then(r => r.json()),
     ]);
     countyData = data;
-
-    const geojson = topojson.feature(topo, topo.objects.counties);
+    const topoKey = Object.keys(topo.objects)[0];
+    const geojson = topojson.feature(topo, topo.objects[topoKey]);
 
     geoLayer = L.geoJSON(geojson, {
       style: styleFeature,
       onEachFeature: (feature, layer) => {
-        const fips = String(feature.id).padStart(5, '0');
+        const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
         layerByFips[fips] = layer;
         layer.on({
           mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
-          mouseout:  () => { tooltip.style.display = 'none'; },
-          click:     e => showTooltip(e, feature),
+          mouseout: () => { tooltip.style.display = 'none'; },
+          click: e => showTooltip(e, feature),
         });
       },
     }).addTo(map);
 
     updateMap();
+    buildTopCountiesList();
     document.getElementById('loading').style.display = 'none';
-
   } catch (err) {
     console.error(err);
     document.querySelector('.spinner').style.display = 'none';
@@ -770,9 +863,9 @@ document.addEventListener('click', e => {
     const errEl = document.getElementById('loading-err');
     errEl.style.display = 'block';
     errEl.innerHTML = `<strong>Could not load data.</strong><br>${err.message}<br><br>
-      <small>The Census API may be rate-limiting. Try refreshing, or add a free API key at
+      <small>Census API may be rate-limiting. Refresh, or get a free key at
       <a href="https://api.census.gov/data/key_signup.html" style="color:#93c5fd" target="_blank">api.census.gov</a>
-      and paste it into the CENSUS_KEY variable at the top of the script.</small>`;
+      and paste it into CENSUS_KEY in the source.</small>`;
   }
 })();
 </script>
