@@ -79,10 +79,72 @@
       letter-spacing: 0.01em;
     }
 
+    #geo-toggle {
+      display: flex;
+      margin: 14px 22px 0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .geo-btn {
+      flex: 1;
+      padding: 9px 8px;
+      font-size: 11.5px;
+      background: transparent;
+      color: var(--text-2);
+      border: none;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      font-family: inherit;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .geo-btn + .geo-btn { border-left: 1px solid var(--line); }
+    .geo-btn:hover { background: var(--surface-2); color: var(--text); }
+    .geo-btn.active { background: var(--accent); color: #0b1530; font-weight: 600; }
+    .geo-btn em {
+      display: block;
+      font-style: normal;
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(11,21,48,0.55);
+      margin-top: 1px;
+      font-weight: 500;
+    }
+    .geo-btn:not(.active) em { color: var(--text-3); }
+
+    #city-select-wrap { margin: 10px 22px 0; display: none; }
+    #city-select-wrap.shown { display: block; }
+    #city-select-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    #city-select {
+      width: 100%;
+      padding: 9px 11px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    #city-select:hover { border-color: #3a4150; }
+    #city-select:focus { outline: none; border-color: var(--accent); }
+
     #control-card {
       padding: 14px 22px 16px;
       background: var(--surface-2);
       border-bottom: 1px solid var(--line);
+      margin-top: 12px;
     }
     #country-select-label {
       font-size: 9.5px;
@@ -296,15 +358,73 @@
       max-width: 250px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
-    #tooltip .tt-name { font-weight: 700; font-size: 13px; color: #f9fafb; margin-bottom: 7px; line-height: 1.2; }
-    #tooltip .tt-row { color: #9ca3af; margin-bottom: 3px; }
-    #tooltip .tt-row span { color: #e5e7eb; font-weight: 600; }
-    #tooltip .tt-highlight { color: #93c5fd; font-weight: 700; font-size: 14px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #374151; }
-    #tooltip .tt-top { margin-top: 8px; padding-top: 7px; border-top: 1px solid #374151; }
-    #tooltip .tt-top-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7280; margin-bottom: 4px; }
-    #tooltip .tt-top-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #d1d5db; line-height: 1.5; }
-    #tooltip .tt-top-row .tt-rank { color: #6b7280; width: 14px; flex-shrink: 0; }
-    #tooltip .tt-top-row .tt-cname { flex: 1; color: #e5e7eb; }
+    #tooltip .tt-name {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      color: #f9fafb;
+      margin-bottom: 9px;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+    }
+    #tooltip .tt-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: baseline;
+      padding: 4px 0;
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    #tooltip .tt-stat .tt-stat-label { color: var(--text-2); }
+    #tooltip .tt-stat .tt-stat-val { color: #e5e7eb; font-weight: 600; font-variant-numeric: tabular-nums; }
+    #tooltip .tt-sub {
+      font-size: 10.5px;
+      color: var(--text-3);
+      margin-top: 1px;
+      padding-left: 0;
+    }
+    #tooltip .tt-section {
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid var(--line);
+    }
+    #tooltip .tt-highlight {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+    #tooltip .tt-highlight .tt-sub { color: rgba(147,197,253,0.7); margin-top: 2px; }
+    #tooltip .tt-top-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      margin-bottom: 7px;
+      font-weight: 600;
+    }
+    #tooltip .tt-top-label .tt-top-sub {
+      display: block;
+      font-size: 9.5px;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: #4b5563;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    #tooltip .tt-top-row {
+      display: grid;
+      grid-template-columns: 16px 1fr auto auto;
+      column-gap: 8px;
+      font-size: 11.5px;
+      color: #d1d5db;
+      line-height: 1.6;
+      align-items: baseline;
+    }
+    #tooltip .tt-top-row .tt-rank { color: var(--text-3); }
+    #tooltip .tt-top-row .tt-cname { color: #e5e7eb; }
+    #tooltip .tt-top-row .tt-cnum { color: #9ca3af; font-variant-numeric: tabular-nums; }
+    #tooltip .tt-top-row .tt-cpct { color: var(--text-3); font-variant-numeric: tabular-nums; min-width: 30px; text-align: right; }
 
     .hover-county {
       stroke: #f472b6 !important;
@@ -349,9 +469,19 @@
   <div id="sidebar">
     <div id="sidebar-header">
       <div class="eyebrow">An interactive map</div>
-      <h1>Foreign-born <em>America</em>, county by county</h1>
-      <p class="lede">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 94 countries of origin is concentrated.</p>
+      <h1>Foreign-born <em>America</em>, <span id="header-scope">county by county</span></h1>
+      <p class="lede" id="lede-text">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 94 countries of origin is concentrated.</p>
       <p class="source-line">ACS 5-year estimates, <span id="data-year">2024</span> &middot; U.S. Census Bureau</p>
+    </div>
+
+    <div id="geo-toggle">
+      <button class="geo-btn active" data-geo="national">National<em>by county</em></button>
+      <button class="geo-btn" data-geo="city">City zoom<em>by census tract</em></button>
+    </div>
+
+    <div id="city-select-wrap">
+      <div id="city-select-label">Pick a city</div>
+      <select id="city-select"></select>
     </div>
 
     <div id="control-card">
@@ -391,14 +521,30 @@
 
 <div id="tooltip">
   <div class="tt-name" id="tt-name"></div>
-  <div class="tt-row">Total population: <span id="tt-pop"></span></div>
-  <div class="tt-row">All foreign-born: <span id="tt-foreign"></span> (<span id="tt-pct-all"></span>)</div>
-  <div class="tt-highlight" id="tt-country-block" style="display:none">
-    From <span id="tt-clabel"></span>:<br>
-    <span id="tt-ccount"></span> &mdash; <span id="tt-cpct"></span>
+
+  <div class="tt-stat">
+    <span class="tt-stat-label">Total population</span>
+    <span class="tt-stat-val" id="tt-pop"></span>
   </div>
-  <div class="tt-top" id="tt-top-block">
-    <div class="tt-top-label">Top origin countries</div>
+  <div class="tt-stat">
+    <span class="tt-stat-label">Foreign-born residents</span>
+    <span class="tt-stat-val" id="tt-foreign"></span>
+  </div>
+  <div class="tt-sub" id="tt-foreign-share"></div>
+
+  <div class="tt-section tt-highlight" id="tt-country-block" style="display:none">
+    <div class="tt-stat">
+      <span class="tt-stat-label" style="color:inherit">Born in <span id="tt-clabel"></span></span>
+      <span class="tt-stat-val" id="tt-ccount" style="color:inherit"></span>
+    </div>
+    <div class="tt-sub" id="tt-cpct"></div>
+  </div>
+
+  <div class="tt-section" id="tt-top-block">
+    <div class="tt-top-label">
+      Top origin countries
+      <span class="tt-top-sub">share = % of foreign-born</span>
+    </div>
     <div id="tt-top-list"></div>
   </div>
 </div>
@@ -551,13 +697,33 @@ REGIONS.forEach(([region, list]) => list.forEach(([v, name]) => {
   VAR_LABEL[v] = name;
 }));
 
+// Cities config: id, display name, county FIPS that make up the city's coverage area
+const CITIES = [
+  { id: 'nyc',          name: 'New York',     counties: ['36005','36047','36061','36081','36085'] },
+  { id: 'la',           name: 'Los Angeles',  counties: ['06037'] },
+  { id: 'chicago',      name: 'Chicago',      counties: ['17031'] },
+  { id: 'houston',      name: 'Houston',      counties: ['48201'] },
+  { id: 'phoenix',      name: 'Phoenix',      counties: ['04013'] },
+  { id: 'philadelphia', name: 'Philadelphia', counties: ['42101'] },
+  { id: 'sanantonio',   name: 'San Antonio',  counties: ['48029'] },
+  { id: 'sandiego',     name: 'San Diego',    counties: ['06073'] },
+  { id: 'dallas',       name: 'Dallas',       counties: ['48113'] },
+  { id: 'jacksonville', name: 'Jacksonville', counties: ['12031'] },
+];
+
 // State
-let countyData = {};
+let activeData = {};         // data currently shown (county or filtered tracts)
+let countyDataAll = {};      // cached national/county dataset
+let tractDataAll = null;     // cached tract-level dataset (lazy-loaded)
+let tractTopo = null;        // cached tract topojson
+let geoLevel = 'national';   // 'national' or 'city'
+let currentCity = null;      // city id when geoLevel === 'city'
 let currentVar = 'ALL';
 let currentLabel = 'All countries';
 let viewMode = 'pop';
 let geoLayer = null;
 let layerByFips = {};
+let stateMeshLayer = null;
 let colorScale = null;
 let breakValues = [];
 
@@ -588,7 +754,7 @@ const COLOR_STOPS = (() => {
 })();
 const NO_DATA_COLOR = '#1c2330';
 function buildColorScale() {
-  const vals = Object.keys(countyData)
+  const vals = Object.keys(activeData)
     .map(f => getRawPct(f))
     .filter(v => v !== null && v > 0);
   if (!vals.length) {
@@ -634,7 +800,7 @@ function updateLegend() {
 
 // ----- compute -----
 function getRawPct(fips) {
-  const d = countyData[fips];
+  const d = activeData[fips];
   if (!d) return null;
   if (currentVar === 'ALL') {
     if (!d.pop || d.pop <= 0) return null;
@@ -687,12 +853,13 @@ function buildTopCountiesList() {
   const isAll = currentVar === 'ALL';
   const sortByPct = (viewMode === 'pop');
 
-  // Filter: skip tiny counties when sorting by % to avoid statistically noisy estimates
-  const minPop = sortByPct ? 5000 : 50;
+  // Filter: skip tiny units when sorting by % to avoid statistically noisy estimates
+  const isCityMode = (geoLevel === 'city');
+  const minPop = sortByPct ? (isCityMode ? 800 : 5000) : 50;
 
   const entries = [];
-  for (const fips in countyData) {
-    const d = countyData[fips];
+  for (const fips in activeData) {
+    const d = activeData[fips];
     const n = isAll ? d.foreign : d[currentVar];
     if (n > 0 && d.pop > minPop) {
       const denom = (!isAll && viewMode === 'fb') ? d.foreign : d.pop;
@@ -706,21 +873,28 @@ function buildTopCountiesList() {
   let html = '';
   const primaryKey = sortByPct ? 'pct' : 'n';
   const sortLabel = sortByPct ? 'by % of population' : 'by total count';
+  const isCity = (geoLevel === 'city');
+  const cityName = isCity ? (CITIES.find(c => c.id === currentCity)?.name || '') : '';
+  const unitLabel = isCity ? 'tracts' : 'counties';
+  const topN = isCity ? 25 : 50;
+  const botN = isCity ? 15 : 50;
 
   if (isAll) {
-    const top50 = entries.slice(0, 50);
-    const bottom50 = entries.slice(-50).reverse();
-    const topMax = top50.length ? top50[0][primaryKey] : 0;
-    const botMax = bottom50.length ? bottom50[0][primaryKey] : 0;
-    html += `<div class="tc-header">Top 50 &mdash; <em>most foreign-born</em> &middot; ${sortLabel}</div>`;
-    html += renderRows(top50, 1, topMax);
-    html += `<div class="tc-header">Bottom 50 &mdash; <em>fewest (with any)</em></div>`;
-    html += renderRows(bottom50, 1, botMax, { bottom: true });
+    const top = entries.slice(0, topN);
+    const bot = entries.slice(-botN).reverse();
+    const topMax = top.length ? top[0][primaryKey] : 0;
+    const botMax = bot.length ? bot[0][primaryKey] : 0;
+    const cityTag = isCity ? ` in <em>${cityName}</em>` : '';
+    html += `<div class="tc-header">Top ${topN} ${unitLabel}${cityTag} &mdash; <em>most foreign-born</em> &middot; ${sortLabel}</div>`;
+    html += renderRows(top, 1, topMax);
+    html += `<div class="tc-header">Bottom ${botN} ${unitLabel}${cityTag} &mdash; <em>fewest (with any)</em></div>`;
+    html += renderRows(bot, 1, botMax, { bottom: true });
   } else {
-    const top25 = entries.slice(0, 25);
-    const topMax = top25.length ? top25[0][primaryKey] : 0;
-    html += `<div class="tc-header">Top 25 counties &mdash; <em>${currentLabel}</em> &middot; ${sortLabel}</div>`;
-    html += renderRows(top25, 1, topMax);
+    const top = entries.slice(0, topN);
+    const topMax = top.length ? top[0][primaryKey] : 0;
+    const cityTag = isCity ? ` in <em>${cityName}</em>` : '';
+    html += `<div class="tc-header">Top ${topN} ${unitLabel}${cityTag} &mdash; <em>${currentLabel}</em> &middot; ${sortLabel}</div>`;
+    html += renderRows(top, 1, topMax);
   }
 
   container.innerHTML = html;
@@ -768,26 +942,34 @@ const tooltip = document.getElementById('tooltip');
 
 function showTooltip(e, feature) {
   const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
-  const d = countyData[fips];
+  const d = activeData[fips];
   if (!d) return;
 
-  const pctAll = d.pop > 0 && d.foreign >= 0 ? ((d.foreign / d.pop) * 100).toFixed(1) + '%' : 'N/A';
   document.getElementById('tt-name').textContent = d.name;
   document.getElementById('tt-pop').textContent = d.pop ? d.pop.toLocaleString() : 'N/A';
   document.getElementById('tt-foreign').textContent = d.foreign >= 0 ? d.foreign.toLocaleString() : 'N/A';
-  document.getElementById('tt-pct-all').textContent = pctAll;
+
+  const fShareEl = document.getElementById('tt-foreign-share');
+  if (d.pop > 0 && d.foreign >= 0) {
+    const pctAll = ((d.foreign / d.pop) * 100).toFixed(1);
+    fShareEl.textContent = `${pctAll}% of total population`;
+    fShareEl.style.display = 'block';
+  } else {
+    fShareEl.style.display = 'none';
+  }
 
   const cb = document.getElementById('tt-country-block');
   if (currentVar !== 'ALL') {
     const n = d[currentVar];
-    let cpct = 'N/A';
+    let pctText = '';
     if (n >= 0) {
-      if (viewMode === 'fb' && d.foreign > 0) cpct = ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born';
-      else if (d.pop > 0) cpct = ((n / d.pop) * 100).toFixed(2) + '% of population';
+      const ofPop = d.pop > 0 ? ((n / d.pop) * 100).toFixed(2) + '% of total population' : null;
+      const ofFb  = d.foreign > 0 ? ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born' : null;
+      pctText = [ofPop, ofFb].filter(Boolean).join(' &middot; ');
     }
     document.getElementById('tt-clabel').textContent = currentLabel;
     document.getElementById('tt-ccount').textContent = n >= 0 ? n.toLocaleString() : 'N/A';
-    document.getElementById('tt-cpct').textContent = cpct;
+    document.getElementById('tt-cpct').innerHTML = pctText || 'N/A';
     cb.style.display = 'block';
   } else {
     cb.style.display = 'none';
@@ -807,7 +989,8 @@ function showTooltip(e, feature) {
         return `<div class="tt-top-row">
           <span class="tt-rank">${i+1}.</span>
           <span class="tt-cname">${VAR_LABEL[o.v] || o.v}</span>
-          <span style="color:#9ca3af">${o.n.toLocaleString()} <span style="color:#6b7280">(${share}%)</span></span>
+          <span class="tt-cnum">${o.n.toLocaleString()}</span>
+          <span class="tt-cpct">${share}%</span>
         </div>`;
       }).join('');
       topBlock.style.display = 'block';
@@ -928,9 +1111,9 @@ function runSearch(q) {
   q = q.trim().toLowerCase();
   if (q.length < 2) { searchResults.style.display = 'none'; return; }
   const matches = [];
-  for (const fips in countyData) {
-    if (countyData[fips].name.toLowerCase().includes(q)) {
-      matches.push({ fips, name: countyData[fips].name });
+  for (const fips in activeData) {
+    if (activeData[fips].name.toLowerCase().includes(q)) {
+      matches.push({ fips, name: activeData[fips].name });
       if (matches.length >= 30) break;
     }
   }
@@ -969,8 +1152,191 @@ document.addEventListener('click', e => {
   }
 });
 
+// ----- city mode -----
+function buildCitySelect() {
+  const sel = document.getElementById('city-select');
+  sel.innerHTML = CITIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  sel.addEventListener('change', () => switchToCity(sel.value));
+}
+
+async function loadTractDataIfNeeded() {
+  if (tractDataAll && tractTopo) return;
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('loading-msg').textContent = 'Loading neighborhood-level data...';
+  try {
+    const [data, topo] = await Promise.all([
+      fetch('city-tracts-data.json').then(r => r.json()),
+      fetch('city-tracts.topojson').then(r => r.json()),
+    ]);
+    // Normalize: source uses {n: name, B05002_001E: ..., B05006_xxxE: ...}
+    const normalized = {};
+    for (const geoid in data) {
+      const m = data[geoid];
+      const obj = { name: m.n, pop: m['B05002_001E'] || 0, foreign: m['B05006_001E'] };
+      if (obj.foreign === undefined || obj.foreign === null) obj.foreign = -1;
+      COUNTRY_VARS.forEach(v => {
+        obj[v] = m[v] !== undefined ? m[v] : -1;
+      });
+      normalized[geoid] = obj;
+    }
+    tractDataAll = normalized;
+    tractTopo = topo;
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+function switchToCity(cityId) {
+  const city = CITIES.find(c => c.id === cityId);
+  if (!city) return;
+  currentCity = cityId;
+  if (geoLevel !== 'city') {
+    geoLevel = 'city';
+    document.querySelectorAll('.geo-btn').forEach(b => b.classList.toggle('active', b.dataset.geo === 'city'));
+    document.getElementById('city-select-wrap').classList.add('shown');
+    document.getElementById('header-scope').textContent = 'neighborhood by neighborhood';
+    document.getElementById('lede-text').textContent =
+      'Census tracts inside America\'s ten largest cities — about neighborhood-sized — ranked and colored by foreign-born share.';
+  }
+  document.getElementById('city-select').value = cityId;
+  enterCityMode(city);
+}
+
+async function enterCityMode(city) {
+  await loadTractDataIfNeeded();
+
+  // Filter tract dataset to this city's counties
+  const prefixes = city.counties; // 5-char strings like "36005"
+  const filtered = {};
+  for (const geoid in tractDataAll) {
+    if (prefixes.includes(geoid.slice(0, 5))) filtered[geoid] = tractDataAll[geoid];
+  }
+  activeData = filtered;
+
+  // Filter topojson features for this city
+  const topoKey = Object.keys(tractTopo.objects)[0];
+  const allFeatures = topojson.feature(tractTopo, tractTopo.objects[topoKey]);
+  const cityFeatures = {
+    type: 'FeatureCollection',
+    features: allFeatures.features.filter(f => {
+      const id = String(f.id || f.properties.GEOID || '');
+      return prefixes.includes(id.slice(0, 5));
+    })
+  };
+
+  // Swap layers
+  if (geoLayer) map.removeLayer(geoLayer);
+  if (stateMeshLayer) map.removeLayer(stateMeshLayer);
+  layerByFips = {};
+
+  geoLayer = L.geoJSON(cityFeatures, {
+    style: styleFeature,
+    onEachFeature: (feature, layer) => {
+      const id = String(feature.id || feature.properties.GEOID);
+      layerByFips[id] = layer;
+      layer.on({
+        mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
+        mouseover: () => { if (layer._path) layer._path.classList.add('hover-county'); },
+        mouseout: () => {
+          tooltip.style.display = 'none';
+          if (layer._path) layer._path.classList.remove('hover-county');
+        },
+        click: e => showTooltip(e, feature),
+      });
+    },
+  }).addTo(map);
+
+  // County boundary overlay within city (so neighborhoods within a borough/county are clearly grouped)
+  const cityCountyMesh = topojson.mesh(tractTopo, tractTopo.objects[topoKey],
+    (a, b) => (a.properties.STATEFP + a.properties.COUNTYFP) !== (b.properties.STATEFP + b.properties.COUNTYFP));
+  stateMeshLayer = L.geoJSON(cityCountyMesh, {
+    pane: 'state-borders',
+    interactive: false,
+    style: { color: 'rgba(255,255,255,0.55)', weight: 1.0, opacity: 1, fill: false }
+  }).addTo(map);
+
+  map.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
+  updateMap();
+  buildTopCountiesList();
+}
+
+function exitCityMode() {
+  geoLevel = 'national';
+  currentCity = null;
+  document.querySelectorAll('.geo-btn').forEach(b => b.classList.toggle('active', b.dataset.geo === 'national'));
+  document.getElementById('city-select-wrap').classList.remove('shown');
+  document.getElementById('header-scope').textContent = 'county by county';
+  document.getElementById('lede-text').textContent =
+    'Where America\'s roughly 46 million immigrants live — and where the largest community from each of 94 countries of origin is concentrated.';
+
+  if (geoLayer) map.removeLayer(geoLayer);
+  if (stateMeshLayer) map.removeLayer(stateMeshLayer);
+  layerByFips = {};
+
+  activeData = countyDataAll;
+  setupCountyLayer(countyTopoCached, countyGeojsonCached);
+  map.setView(countyHomeView.center, countyHomeView.zoom);
+  updateMap();
+  buildTopCountiesList();
+}
+
+function hookGeoToggle() {
+  document.querySelectorAll('.geo-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.geo;
+      if (target === 'city') {
+        const sel = document.getElementById('city-select');
+        const cityId = sel.value || CITIES[0].id;
+        sel.value = cityId;
+        switchToCity(cityId);
+      } else {
+        if (geoLevel !== 'national') exitCityMode();
+      }
+    });
+  });
+}
+
 // ----- init -----
 buildCountryDropdown();
+buildCitySelect();
+hookGeoToggle();
+
+let countyTopoCached = null;
+let countyGeojsonCached = null;
+const countyHomeView = { center: [38.5, -97], zoom: 4 };
+
+function setupCountyLayer(topo, geojson) {
+  geoLayer = L.geoJSON(geojson, {
+    style: styleFeature,
+    onEachFeature: (feature, layer) => {
+      const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
+      layerByFips[fips] = layer;
+      layer.on({
+        mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
+        mouseover: () => { if (layer._path) layer._path.classList.add('hover-county'); },
+        mouseout: () => {
+          tooltip.style.display = 'none';
+          if (layer._path) layer._path.classList.remove('hover-county');
+        },
+        click: e => showTooltip(e, feature),
+      });
+    },
+  }).addTo(map);
+
+  if (!map.getPane('state-borders')) {
+    const statePane = map.createPane('state-borders');
+    statePane.style.zIndex = 640;
+    statePane.style.pointerEvents = 'none';
+  }
+  const topoKey = Object.keys(topo.objects)[0];
+  const stateMesh = topojson.mesh(topo, topo.objects[topoKey],
+    (a, b) => a.properties.STATEFP !== b.properties.STATEFP);
+  stateMeshLayer = L.geoJSON(stateMesh, {
+    pane: 'state-borders',
+    interactive: false,
+    style: { color: 'rgba(255,255,255,0.42)', weight: 0.7, opacity: 1, fill: false }
+  }).addTo(map);
+}
 
 (async () => {
   try {
@@ -979,38 +1345,13 @@ buildCountryDropdown();
       loadCensusData(),
       fetch('counties-2022.topojson').then(r => r.json()),
     ]);
-    countyData = data;
+    countyDataAll = data;
+    activeData = data;
+    countyTopoCached = topo;
     const topoKey = Object.keys(topo.objects)[0];
-    const geojson = topojson.feature(topo, topo.objects[topoKey]);
+    countyGeojsonCached = topojson.feature(topo, topo.objects[topoKey]);
 
-    geoLayer = L.geoJSON(geojson, {
-      style: styleFeature,
-      onEachFeature: (feature, layer) => {
-        const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
-        layerByFips[fips] = layer;
-        layer.on({
-          mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
-          mouseover: () => { if (layer._path) layer._path.classList.add('hover-county'); },
-          mouseout: () => {
-            tooltip.style.display = 'none';
-            if (layer._path) layer._path.classList.remove('hover-county');
-          },
-          click: e => showTooltip(e, feature),
-        });
-      },
-    }).addTo(map);
-
-    // State boundary mesh — drawn on top of the choropleth, below labels
-    const statePane = map.createPane('state-borders');
-    statePane.style.zIndex = 640;
-    statePane.style.pointerEvents = 'none';
-    const stateMesh = topojson.mesh(topo, topo.objects[topoKey],
-      (a, b) => a.properties.STATEFP !== b.properties.STATEFP);
-    L.geoJSON(stateMesh, {
-      pane: 'state-borders',
-      interactive: false,
-      style: { color: 'rgba(255,255,255,0.42)', weight: 0.7, opacity: 1, fill: false }
-    }).addTo(map);
+    setupCountyLayer(topo, countyGeojsonCached);
 
     updateMap();
     buildTopCountiesList();
