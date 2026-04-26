@@ -5,163 +5,282 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Foreign-born population by U.S. county</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #111827; color: #e5e7eb; }
+    :root {
+      --bg: #0f1115;
+      --surface: #181b22;
+      --surface-2: #1f232c;
+      --line: #2a2f3a;
+      --line-soft: #232832;
+      --text: #e8eaef;
+      --text-2: #a8aebd;
+      --text-3: #6b7280;
+      --accent: #93c5fd;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-feature-settings: 'cv11', 'ss01', 'tnum' off;
+      -webkit-font-smoothing: antialiased;
+    }
     #app { display: flex; height: 100vh; }
 
     #sidebar {
-      width: 320px;
+      width: 340px;
       flex-shrink: 0;
-      background: #1f2937;
-      border-right: 1px solid #374151;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
     #sidebar-header {
-      padding: 16px 16px 14px;
-      border-bottom: 1px solid #374151;
+      padding: 22px 22px 18px;
+      border-bottom: 1px solid var(--line);
     }
-    h1 { font-size: 15px; font-weight: 700; line-height: 1.3; color: #f9fafb; }
-    .subtitle { font-size: 11px; color: #6b7280; margin-top: 3px; }
-
-    #country-select-wrap {
-      margin-top: 12px;
-    }
-    #country-select-label {
+    .eyebrow {
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6b7280;
-      margin-bottom: 5px;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.18;
+      letter-spacing: -0.015em;
+      color: #f4f5f8;
+      margin-bottom: 10px;
+    }
+    h1 em { font-style: italic; font-weight: 500; color: #c8cdd9; }
+    .lede {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+    .source-line {
+      font-size: 10.5px;
+      color: var(--text-3);
+      margin-top: 12px;
+      letter-spacing: 0.01em;
+    }
+
+    #control-card {
+      padding: 14px 22px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--line);
+    }
+    #country-select-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 6px;
+      font-weight: 600;
     }
     #country-select {
       width: 100%;
-      padding: 8px 10px;
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 5px;
-      color: #f3f4f6;
+      padding: 9px 11px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
       font-size: 13px;
       font-family: inherit;
       cursor: pointer;
+      transition: border-color 0.15s;
     }
-    #country-select:focus { outline: none; border-color: #3b82f6; }
-    #country-select optgroup { color: #6b7280; font-style: normal; font-weight: 600; }
-    #country-select option { color: #f3f4f6; background: #111827; }
+    #country-select:hover { border-color: #3a4150; }
+    #country-select:focus { outline: none; border-color: var(--accent); }
+    #country-select optgroup { color: var(--text-3); font-style: normal; font-weight: 600; }
+    #country-select option { color: var(--text); background: var(--bg); }
 
     #mode-toggle {
       display: flex;
       margin-top: 10px;
-      border: 1px solid #374151;
-      border-radius: 5px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
       overflow: hidden;
+      background: var(--bg);
     }
     .mode-btn {
       flex: 1;
-      padding: 7px 6px;
+      padding: 8px 6px;
       font-size: 11px;
       background: transparent;
-      color: #9ca3af;
+      color: var(--text-2);
       border: none;
       cursor: pointer;
       transition: background 0.12s, color 0.12s;
       font-family: inherit;
+      font-weight: 500;
+      letter-spacing: 0.01em;
     }
-    .mode-btn + .mode-btn { border-left: 1px solid #374151; }
-    .mode-btn:hover { background: #374151; color: #f3f4f6; }
-    .mode-btn.active { background: #3b82f6; color: #fff; }
+    .mode-btn + .mode-btn { border-left: 1px solid var(--line); }
+    .mode-btn:hover { background: var(--surface-2); color: var(--text); }
+    .mode-btn.active { background: var(--accent); color: #0b1530; font-weight: 600; }
     .mode-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-    .mode-btn:disabled:hover { background: transparent; color: #9ca3af; }
+    .mode-btn:disabled:hover { background: transparent; color: var(--text-2); }
 
     #search-wrap {
       position: relative;
-      margin: 10px 16px 0;
+      margin: 14px 22px 0;
     }
     #search-input {
       width: 100%;
-      padding: 7px 10px;
-      background: #111827;
-      border: 1px solid #374151;
-      border-radius: 5px;
-      color: #f3f4f6;
+      padding: 9px 11px 9px 32px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
       font-size: 12.5px;
       font-family: inherit;
+      transition: border-color 0.15s;
     }
-    #search-input::placeholder { color: #6b7280; }
-    #search-input:focus { outline: none; border-color: #3b82f6; }
+    #search-input::placeholder { color: var(--text-3); }
+    #search-input:hover { border-color: #3a4150; }
+    #search-input:focus { outline: none; border-color: var(--accent); }
+    .search-icon {
+      position: absolute;
+      left: 11px; top: 50%;
+      transform: translateY(-50%);
+      width: 13px; height: 13px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
     #search-results {
       position: absolute;
       top: 100%; left: 0; right: 0;
-      margin-top: 2px;
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 5px;
-      max-height: 240px;
+      margin-top: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      max-height: 260px;
       overflow-y: auto;
       z-index: 1100;
       display: none;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
     .search-item {
-      padding: 7px 10px;
+      padding: 8px 12px;
       font-size: 12.5px;
-      color: #d1d5db;
+      color: var(--text);
       cursor: pointer;
-      border-bottom: 1px solid #2d3748;
+      border-bottom: 1px solid var(--line-soft);
+      transition: background 0.1s;
     }
     .search-item:last-child { border-bottom: none; }
-    .search-item:hover { background: #374151; color: #fff; }
+    .search-item:hover { background: var(--surface); color: #fff; }
 
-    #sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 12px 20px; }
+    #sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 22px 24px;
+    }
+    #sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    #sidebar-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+    #sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 
-    #top-counties-section { margin-top: 12px; }
     .tc-header {
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #6b7280;
-      margin: 14px 0 6px;
-      padding: 0 4px;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      font-weight: 600;
+      margin: 22px 0 10px;
+      padding: 0 0 8px;
+      border-bottom: 1px solid var(--line-soft);
     }
-    .tc-header:first-child { margin-top: 4px; }
+    .tc-header:first-child { margin-top: 16px; }
+    .tc-header em { font-style: normal; color: var(--text); font-weight: 600; text-transform: none; letter-spacing: 0; }
+
     .top-county {
+      position: relative;
       display: grid;
       grid-template-columns: 22px 1fr auto;
       gap: 8px;
-      padding: 5px 8px;
+      padding: 7px 9px;
       margin-bottom: 1px;
-      border-radius: 4px;
-      font-size: 11.5px;
+      border-radius: 5px;
+      font-size: 12px;
       cursor: pointer;
-      transition: background 0.1s;
+      transition: background 0.12s;
       align-items: baseline;
+      overflow: hidden;
     }
-    .top-county:hover { background: #374151; }
-    .top-county .tc-rank { color: #6b7280; font-variant-numeric: tabular-nums; }
-    .top-county .tc-name { color: #e5e7eb; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .top-county .tc-stat { color: #93c5fd; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11px; text-align: right; }
-    .top-county .tc-stat .tc-pct { color: #6b7280; font-weight: 500; margin-left: 4px; }
+    .top-county::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: var(--bar-w, 0%);
+      background: linear-gradient(90deg, rgba(147,197,253,0.10), rgba(147,197,253,0.02));
+      border-left: 2px solid rgba(147,197,253,0.35);
+      transition: width 0.4s ease;
+      pointer-events: none;
+    }
+    .top-county > * { position: relative; z-index: 1; }
+    .top-county:hover { background: var(--surface-2); }
+    .top-county.bottom-row::before {
+      background: linear-gradient(90deg, rgba(244,114,182,0.06), rgba(244,114,182,0.01));
+      border-left-color: rgba(244,114,182,0.25);
+    }
+    .top-county .tc-rank { color: var(--text-3); font-variant-numeric: tabular-nums; font-weight: 500; }
+    .top-county .tc-name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-county .tc-stat { color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 11.5px; text-align: right; letter-spacing: -0.005em; }
+    .top-county .tc-stat .tc-pct { color: var(--text-3); font-weight: 500; margin-left: 5px; font-size: 10.5px; }
 
     #sidebar-footer {
-      padding: 12px 16px;
-      border-top: 1px solid #374151;
+      padding: 14px 22px 16px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
     }
-    .legend-label { font-size: 10px; color: #9ca3af; margin-bottom: 6px; line-height: 1.4; }
+    .legend-label {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-bottom: 8px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
     .legend-gradient {
-      height: 10px;
+      height: 9px;
       border-radius: 2px;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
-    .legend-ticks { display: flex; justify-content: space-between; font-size: 10px; color: #9ca3af; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
-    .data-note { font-size: 10px; color: #4b5563; line-height: 1.5; }
-    .data-note a { color: #6b7280; }
+    .legend-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-3);
+      margin-bottom: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .data-note {
+      font-size: 10.5px;
+      color: var(--text-3);
+      line-height: 1.55;
+    }
+    .data-note a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
+    .data-note a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
     #map { flex: 1; }
+    .leaflet-interactive {
+      transition: fill 0.5s ease, fill-opacity 0.3s ease;
+    }
+    .leaflet-container { background: var(--bg); }
 
     #tooltip {
       position: fixed;
@@ -229,19 +348,23 @@
 <div id="app">
   <div id="sidebar">
     <div id="sidebar-header">
-      <h1>Foreign-born population by U.S. county</h1>
-      <p class="subtitle">ACS 5-year estimates &mdash; <span id="data-year">2024</span> &mdash; U.S. Census Bureau</p>
-      <div id="country-select-wrap">
-        <div id="country-select-label">Show immigrants from</div>
-        <select id="country-select"></select>
-      </div>
+      <div class="eyebrow">An interactive map</div>
+      <h1>Foreign-born <em>America</em>, county by county</h1>
+      <p class="lede">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 94 countries of origin is concentrated.</p>
+      <p class="source-line">ACS 5-year estimates, <span id="data-year">2024</span> &middot; U.S. Census Bureau</p>
+    </div>
+
+    <div id="control-card">
+      <div id="country-select-label">Show immigrants from</div>
+      <select id="country-select"></select>
       <div id="mode-toggle">
         <button class="mode-btn active" data-mode="pop">% of population</button>
-        <button class="mode-btn" data-mode="fb" disabled>% of foreign-born</button>
+        <button class="mode-btn" data-mode="fb">Total counts</button>
       </div>
     </div>
 
     <div id="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       <input id="search-input" type="text" placeholder="Search county or state..." autocomplete="off" spellcheck="false">
       <div id="search-results"></div>
     </div>
@@ -452,33 +575,45 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
 }).addTo(map);
 
 // ----- color scale (quantile) -----
-// Viridis: perceptually uniform, colorblind-friendly, editorially neutral
+// Inferno: heat-map style intensity (dark navy → red → orange → yellow → near-white).
+// Reads as "more / less" the way a single-hue gradient does.
+const N_STOPS = 14;
 const COLOR_STOPS = (() => {
   const stops = [];
-  for (let i = 0; i < 10; i++) stops.push(d3.interpolateViridis(0.05 + (i / 9) * 0.92));
+  for (let i = 0; i < N_STOPS; i++) {
+    // Compress into 0.08..0.96 so the darkest end isn't pure black (blends into bg)
+    stops.push(d3.interpolateInferno(0.08 + (i / (N_STOPS - 1)) * 0.88));
+  }
   return stops;
 })();
+const NO_DATA_COLOR = '#1c2330';
 function buildColorScale() {
   const vals = Object.keys(countyData)
     .map(f => getRawPct(f))
     .filter(v => v !== null && v > 0);
   if (!vals.length) {
     breakValues = [];
-    colorScale = () => '#1f2937';
+    colorScale = () => NO_DATA_COLOR;
     return;
   }
   vals.sort(d3.ascending);
+  // Split allocation: half the color stops cover the bottom 80% of counties,
+  // the other half cover the top 20% — gives much more visual spread at the high end.
   const n = COLOR_STOPS.length;
+  const lowN = Math.floor(n * 0.55);
+  const highN = n - lowN;
   breakValues = [];
-  for (let i = 1; i < n; i++) {
-    breakValues.push(d3.quantile(vals, i / n));
+  for (let i = 1; i <= lowN; i++) {
+    breakValues.push(d3.quantile(vals, (i / lowN) * 0.80));
+  }
+  for (let i = 1; i < highN; i++) {
+    breakValues.push(d3.quantile(vals, 0.80 + (i / highN) * 0.20));
   }
   colorScale = (v) => {
-    if (v === null || isNaN(v)) return '#1f2937';
-    let idx = 0;
+    if (v === null || isNaN(v)) return NO_DATA_COLOR;
+    let idx = breakValues.length;
     for (let i = 0; i < breakValues.length; i++) {
       if (v <= breakValues[i]) { idx = i; break; }
-      idx = i + 1;
     }
     return COLOR_STOPS[idx];
   };
@@ -490,9 +625,10 @@ function updateLegend() {
   const ticks = document.getElementById('legend-ticks');
   if (!breakValues.length) { ticks.innerHTML = '<span>0%</span><span></span><span></span>'; return; }
   const fmt = v => v >= 10 ? v.toFixed(0) + '%' : v.toFixed(1) + '%';
+  const lowEnd = Math.floor(breakValues.length * 0.55) - 1;
   const lo = 0;
-  const mid = breakValues[Math.floor(breakValues.length / 2)];
-  const hi = breakValues[breakValues.length - 1];
+  const mid = breakValues[Math.max(0, lowEnd)];     // boundary between "main" and "high" range
+  const hi  = breakValues[breakValues.length - 1];  // top break
   ticks.innerHTML = `<span>${fmt(lo)}</span><span>${fmt(mid)}</span><span>${fmt(hi)}+</span>`;
 }
 
@@ -519,7 +655,7 @@ function getRawPct(fips) {
 function styleFeature(feature) {
   const fips = String(feature.id || feature.properties.GEOID).padStart(5, '0');
   return {
-    fillColor: colorScale ? colorScale(getRawPct(fips)) : '#1f2937',
+    fillColor: colorScale ? colorScale(getRawPct(fips)) : NO_DATA_COLOR,
     fillOpacity: 0.88,
     color: '#0b1220',
     weight: 0.4,
@@ -537,11 +673,11 @@ function updateMap() {
 function updateLegendLabel() {
   const el = document.getElementById('legend-label');
   if (currentVar === 'ALL') {
-    el.textContent = '% of county population that is foreign-born';
+    el.textContent = 'Map color: % of county population that is foreign-born';
   } else if (viewMode === 'fb') {
-    el.textContent = `% of foreign-born from ${currentLabel}`;
+    el.textContent = `Map color: % of foreign-born population from ${currentLabel}`;
   } else {
-    el.textContent = `% of population born in ${currentLabel}`;
+    el.textContent = `Map color: % of total population born in ${currentLabel}`;
   }
 }
 
@@ -549,28 +685,42 @@ function updateLegendLabel() {
 function buildTopCountiesList() {
   const container = document.getElementById('top-counties-section');
   const isAll = currentVar === 'ALL';
+  const sortByPct = (viewMode === 'pop');
+
+  // Filter: skip tiny counties when sorting by % to avoid statistically noisy estimates
+  const minPop = sortByPct ? 5000 : 50;
 
   const entries = [];
   for (const fips in countyData) {
     const d = countyData[fips];
     const n = isAll ? d.foreign : d[currentVar];
-    if (n > 0 && d.pop > 50) entries.push({ fips, d, n });
+    if (n > 0 && d.pop > minPop) {
+      const denom = (!isAll && viewMode === 'fb') ? d.foreign : d.pop;
+      const pct = denom > 0 ? (n / denom) * 100 : 0;
+      entries.push({ fips, d, n, pct });
+    }
   }
-  entries.sort((a, b) => b.n - a.n);
+  if (sortByPct) entries.sort((a, b) => b.pct - a.pct);
+  else entries.sort((a, b) => b.n - a.n);
 
   let html = '';
+  const primaryKey = sortByPct ? 'pct' : 'n';
+  const sortLabel = sortByPct ? 'by % of population' : 'by total count';
 
   if (isAll) {
     const top50 = entries.slice(0, 50);
     const bottom50 = entries.slice(-50).reverse();
-    html += `<div class="tc-header">Top 50 counties &mdash; most foreign-born</div>`;
-    html += renderRows(top50, 1);
-    html += `<div class="tc-header">Bottom 50 counties (with any foreign-born)</div>`;
-    html += renderRows(bottom50, 1);
+    const topMax = top50.length ? top50[0][primaryKey] : 0;
+    const botMax = bottom50.length ? bottom50[0][primaryKey] : 0;
+    html += `<div class="tc-header">Top 50 &mdash; <em>most foreign-born</em> &middot; ${sortLabel}</div>`;
+    html += renderRows(top50, 1, topMax);
+    html += `<div class="tc-header">Bottom 50 &mdash; <em>fewest (with any)</em></div>`;
+    html += renderRows(bottom50, 1, botMax, { bottom: true });
   } else {
     const top25 = entries.slice(0, 25);
-    html += `<div class="tc-header">Top 25 counties &mdash; ${currentLabel}-born</div>`;
-    html += renderRows(top25, 1);
+    const topMax = top25.length ? top25[0][primaryKey] : 0;
+    html += `<div class="tc-header">Top 25 counties &mdash; <em>${currentLabel}</em> &middot; ${sortLabel}</div>`;
+    html += renderRows(top25, 1, topMax);
   }
 
   container.innerHTML = html;
@@ -582,17 +732,21 @@ function buildTopCountiesList() {
   });
 }
 
-function renderRows(arr, startRank) {
-  const isAll = currentVar === 'ALL';
+function renderRows(arr, startRank, maxPrimary, opts = {}) {
+  const klass = opts.bottom ? ' bottom-row' : '';
+  const primaryIsPct = (viewMode === 'pop');
   return arr.map((e, i) => {
-    const denom = (!isAll && viewMode === 'fb') ? e.d.foreign : e.d.pop;
-    const pct = denom > 0 ? ((e.n / denom) * 100) : 0;
-    const pctStr = pct >= 10 ? pct.toFixed(0) + '%' : pct.toFixed(1) + '%';
+    const pctStr = e.pct >= 10 ? e.pct.toFixed(0) + '%' : e.pct.toFixed(1) + '%';
     const countStr = e.n.toLocaleString();
-    return `<div class="top-county" data-fips="${e.fips}">
+    const primaryStr   = primaryIsPct ? pctStr : countStr;
+    const secondaryStr = primaryIsPct ? countStr : pctStr;
+    // Bar width: scale by primary metric (sqrt to give smaller rows visibility)
+    const primaryVal = primaryIsPct ? e.pct : e.n;
+    const barW = maxPrimary > 0 ? Math.max(2, Math.sqrt(primaryVal / maxPrimary) * 100) : 0;
+    return `<div class="top-county${klass}" data-fips="${e.fips}" style="--bar-w: ${barW.toFixed(1)}%">
       <span class="tc-rank">${startRank + i}.</span>
       <span class="tc-name" title="${e.d.name}">${e.d.name}</span>
-      <span class="tc-stat">${countStr}<span class="tc-pct">${pctStr}</span></span>
+      <span class="tc-stat">${primaryStr}<span class="tc-pct">${secondaryStr}</span></span>
     </div>`;
   }).join('');
 }
@@ -746,18 +900,7 @@ function buildCountryDropdown() {
   sel.innerHTML = html;
   sel.addEventListener('change', () => {
     currentVar = sel.value;
-    if (currentVar === 'ALL') {
-      currentLabel = 'All countries';
-      const fbBtn = document.querySelector('.mode-btn[data-mode="fb"]');
-      fbBtn.disabled = true;
-      if (viewMode === 'fb') {
-        viewMode = 'pop';
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'pop'));
-      }
-    } else {
-      currentLabel = VAR_LABEL[currentVar];
-      document.querySelector('.mode-btn[data-mode="fb"]').disabled = false;
-    }
+    currentLabel = currentVar === 'ALL' ? 'All countries' : VAR_LABEL[currentVar];
     updateLegendLabel();
     updateMap();
     buildTopCountiesList();
@@ -847,10 +990,26 @@ buildCountryDropdown();
         layerByFips[fips] = layer;
         layer.on({
           mousemove: e => { showTooltip(e, feature); positionTooltip(e); },
-          mouseout: () => { tooltip.style.display = 'none'; },
+          mouseover: () => { if (layer._path) layer._path.classList.add('hover-county'); },
+          mouseout: () => {
+            tooltip.style.display = 'none';
+            if (layer._path) layer._path.classList.remove('hover-county');
+          },
           click: e => showTooltip(e, feature),
         });
       },
+    }).addTo(map);
+
+    // State boundary mesh — drawn on top of the choropleth, below labels
+    const statePane = map.createPane('state-borders');
+    statePane.style.zIndex = 640;
+    statePane.style.pointerEvents = 'none';
+    const stateMesh = topojson.mesh(topo, topo.objects[topoKey],
+      (a, b) => a.properties.STATEFP !== b.properties.STATEFP);
+    L.geoJSON(stateMesh, {
+      pane: 'state-borders',
+      interactive: false,
+      style: { color: 'rgba(255,255,255,0.42)', weight: 0.7, opacity: 1, fill: false }
     }).addTo(map);
 
     updateMap();
