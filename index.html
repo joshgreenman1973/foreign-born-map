@@ -548,6 +548,29 @@
       margin-top: 1px;
       padding-left: 0;
     }
+    #tooltip .tt-headline-pct {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fbbf77;
+      line-height: 1;
+      margin: 8px 0 2px;
+    }
+    #tooltip .tt-headline-pct .tt-headline-unit {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+      letter-spacing: 0;
+      margin-left: 4px;
+      font-family: var(--sans);
+    }
+    #tooltip .tt-headline-sub {
+      font-size: 10.5px;
+      color: var(--text-3);
+      letter-spacing: 0.01em;
+      margin-bottom: 2px;
+    }
     #tooltip .tt-section {
       margin-top: 10px;
       padding-top: 9px;
@@ -754,6 +777,9 @@
 <div id="tooltip">
   <div class="tt-name" id="tt-name"></div>
 
+  <div class="tt-headline-sub">Share of population that is foreign-born</div>
+  <div class="tt-headline-pct" id="tt-headline-pct"></div>
+
   <div class="tt-stat">
     <span class="tt-stat-label">Total population</span>
     <span class="tt-stat-val" id="tt-pop"></span>
@@ -762,7 +788,7 @@
     <span class="tt-stat-label">Foreign-born residents</span>
     <span class="tt-stat-val" id="tt-foreign"></span>
   </div>
-  <div class="tt-sub" id="tt-foreign-share"></div>
+  <div class="tt-sub" id="tt-foreign-share" style="display:none"></div>
 
   <div class="tt-citizenship" id="tt-citizenship" style="display:none"></div>
 
@@ -1008,38 +1034,50 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
 
 // ----- color scale (quantile) -----
 // Inferno: heat-map style intensity (dark navy → red → orange → yellow → near-white).
-// Reads as "more / less" the way a single-hue gradient does.
-const N_STOPS = 14;
+// 20 stops with non-uniform percentile breakpoints — most counties cluster at low
+// FB%, but a small set of high-FB counties (NYC area, Miami, etc.) need fine
+// gradation among themselves. The breakpoints get aggressively finer toward the top.
+const BREAK_PERCENTILES = [
+  0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70,   // bottom 70% — even quantile bins
+  0.78, 0.85, 0.90,                           // 70-90% — moderate tightening
+  0.93, 0.95, 0.96, 0.97, 0.98,               // 90-98% — finer
+  0.985, 0.99, 0.993, 0.997,                  // 98-100% — fine enough that top 50
+                                              //          spans 4-5 distinct colors
+];
+const N_STOPS = BREAK_PERCENTILES.length + 1;  // 20
 const COLOR_STOPS = (() => {
   const stops = [];
+  // Start at 0.18 so even the lowest stop is visibly purple, not pitch-black
+  // (which would read as "no data"). End at 0.97 for a near-white top.
   for (let i = 0; i < N_STOPS; i++) {
-    // Compress into 0.08..0.96 so the darkest end isn't pure black (blends into bg)
-    stops.push(d3.interpolateInferno(0.08 + (i / (N_STOPS - 1)) * 0.88));
+    stops.push(d3.interpolateInferno(0.18 + (i / (N_STOPS - 1)) * 0.79));
   }
   return stops;
 })();
-const NO_DATA_COLOR = '#1c2330';
+// Distinct neutral grey-blue that won't be confused with the inferno scale
+const NO_DATA_COLOR = '#252b35';
+
+// Fixed absolute-percentage breakpoints for "All foreign-born + % of pop" mode.
+// Using fixed values means 15% looks the same color in city mode and national
+// mode — which is what users expect intuitively. We only fall back to quantile
+// bins for country-specific or LQ modes where the value range varies wildly.
+const FIXED_PCT_BREAKS = [0.5, 1, 2, 3, 4, 5, 7, 9, 12, 15, 18, 22, 26, 30, 35, 40, 45, 50, 55];
 function buildColorScale() {
-  const vals = Object.keys(activeData)
-    .map(f => getRawPct(f))
-    .filter(v => v !== null && v > 0);
-  if (!vals.length) {
-    breakValues = [];
-    colorScale = () => NO_DATA_COLOR;
-    return;
-  }
-  vals.sort(d3.ascending);
-  // Split allocation: half the color stops cover the bottom 80% of counties,
-  // the other half cover the top 20% — gives much more visual spread at the high end.
-  const n = COLOR_STOPS.length;
-  const lowN = Math.floor(n * 0.55);
-  const highN = n - lowN;
-  breakValues = [];
-  for (let i = 1; i <= lowN; i++) {
-    breakValues.push(d3.quantile(vals, (i / lowN) * 0.80));
-  }
-  for (let i = 1; i < highN; i++) {
-    breakValues.push(d3.quantile(vals, 0.80 + (i / highN) * 0.20));
+  const isAllFB = (currentVar === 'ALL' && viewMode === 'pop');
+  if (isAllFB) {
+    // Fixed absolute percentage breakpoints — same color for 15% in any view
+    breakValues = FIXED_PCT_BREAKS;
+  } else {
+    const vals = Object.keys(activeData)
+      .map(f => getRawPct(f))
+      .filter(v => v !== null && v > 0);
+    if (!vals.length) {
+      breakValues = [];
+      colorScale = () => NO_DATA_COLOR;
+      return;
+    }
+    vals.sort(d3.ascending);
+    breakValues = BREAK_PERCENTILES.map(p => d3.quantile(vals, p));
   }
   colorScale = (v) => {
     if (v === null || isNaN(v)) return NO_DATA_COLOR;
@@ -1341,13 +1379,15 @@ function showTooltip(e, feature) {
   document.getElementById('tt-pop').textContent = d.pop ? d.pop.toLocaleString() : 'N/A';
   document.getElementById('tt-foreign').textContent = d.foreign >= 0 ? d.foreign.toLocaleString() : 'N/A';
 
-  const fShareEl = document.getElementById('tt-foreign-share');
+  const headlineEl = document.getElementById('tt-headline-pct');
   if (d.pop > 0 && d.foreign >= 0) {
     const pctAll = ((d.foreign / d.pop) * 100).toFixed(1);
-    fShareEl.textContent = `${pctAll}% of total population`;
-    fShareEl.style.display = 'block';
+    headlineEl.innerHTML = `${pctAll}<span class="tt-headline-unit">% foreign-born</span>`;
+    headlineEl.style.display = 'block';
+    document.querySelector('#tooltip .tt-headline-sub').style.display = 'block';
   } else {
-    fShareEl.style.display = 'none';
+    headlineEl.style.display = 'none';
+    document.querySelector('#tooltip .tt-headline-sub').style.display = 'none';
   }
 
   // Citizenship breakdown — naturalized vs. non-citizen
