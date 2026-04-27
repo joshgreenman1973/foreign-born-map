@@ -338,6 +338,170 @@
     .data-note a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 2px; }
     .data-note a:hover { color: var(--accent); text-decoration-color: var(--accent); }
 
+    /* Reliability indicator dots */
+    .rel-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: baseline;
+    }
+    .rel-good { background: #4ade80; }
+    .rel-warn { background: #fbbf24; }
+    .rel-bad  { background: #f87171; }
+    .rel-na   { background: #4b5563; }
+    .rel-legend {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .rel-legend .rel-dot { margin-right: 3px; margin-left: 4px; }
+
+    /* National benchmark tick on legend */
+    .legend-benchmark {
+      position: relative;
+      margin-top: 4px;
+      height: 14px;
+      font-size: 9.5px;
+      color: var(--text-3);
+    }
+    .legend-benchmark::before {
+      content: '';
+      position: absolute;
+      top: -7px;
+      width: 1px;
+      height: 11px;
+      background: rgba(255,255,255,0.55);
+      left: var(--bench-pos, 50%);
+    }
+    .legend-benchmark span {
+      position: absolute;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      left: var(--bench-pos, 50%);
+    }
+
+    /* Methodology modal */
+    #methodology-link {
+      display: inline-block;
+      font-size: 10.5px;
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: var(--line);
+      text-underline-offset: 3px;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+    #methodology-link:hover { text-decoration-color: var(--accent); }
+    #methodology-modal {
+      position: fixed; inset: 0;
+      background: rgba(8, 10, 14, 0.78);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    #methodology-modal.shown { display: flex; }
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 30px 36px;
+      max-width: 640px;
+      max-height: 86vh;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal-card h2 {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #f4f5f8;
+      margin-bottom: 4px;
+    }
+    .modal-card .modal-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 18px;
+    }
+    .modal-card h3 {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 16px 0 6px;
+      letter-spacing: -0.005em;
+    }
+    .modal-card p { margin-bottom: 10px; }
+    .modal-card ul { padding-left: 18px; margin-bottom: 10px; }
+    .modal-card li { margin-bottom: 5px; }
+    .modal-card code { font-size: 11.5px; color: var(--accent); background: var(--bg); padding: 1px 5px; border-radius: 3px; }
+    .modal-card a { color: var(--accent); }
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-3);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    /* Country footnote pill in dropdown — not visible directly, used for tooltip text */
+    .country-note {
+      display: block;
+      font-size: 10.5px;
+      color: var(--text-3);
+      margin-top: 6px;
+      padding: 6px 10px;
+      background: rgba(147,197,253,0.06);
+      border-left: 2px solid rgba(147,197,253,0.5);
+      border-radius: 0 4px 4px 0;
+      line-height: 1.5;
+    }
+    .country-note.shown { display: block; }
+
+    /* Tooltip extras */
+    #tooltip .tt-citizenship {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+    #tooltip .tt-citizenship strong { color: var(--text-2); font-weight: 600; }
+    #tooltip .tt-rel-line {
+      font-size: 10.5px;
+      color: var(--text-3);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    #tooltip .tt-rel-line .rel-dot { width: 7px; height: 7px; }
+
+    /* Caveat strip below sidebar header */
+    .caveat-strip {
+      font-size: 10px;
+      color: var(--text-3);
+      line-height: 1.55;
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(251,191,36,0.05);
+      border-left: 2px solid rgba(251,191,36,0.4);
+      border-radius: 0 4px 4px 0;
+    }
+    .caveat-strip strong { color: #fbbf24; font-weight: 600; }
+
     #map { flex: 1; }
     .leaflet-interactive {
       transition: fill 0.5s ease, fill-opacity 0.3s ease;
@@ -470,8 +634,11 @@
     <div id="sidebar-header">
       <div class="eyebrow">An interactive map</div>
       <h1>Foreign-born <em>America</em>, <span id="header-scope">county by county</span></h1>
-      <p class="lede" id="lede-text">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 94 countries of origin is concentrated.</p>
-      <p class="source-line">ACS 5-year estimates, <span id="data-year">2024</span> &middot; U.S. Census Bureau</p>
+      <p class="lede" id="lede-text">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 96 countries of birth is concentrated.</p>
+      <p class="source-line">ACS 5-year estimates (2020&ndash;<span id="data-year">2024</span>) &middot; U.S. Census Bureau &middot; <a id="methodology-link">Methodology &amp; caveats</a></p>
+      <div class="caveat-strip">
+        <strong>Read with care.</strong> Country labels show <em>place of birth</em>, not ancestry &mdash; second-generation Americans aren't counted. The 5-year window averages 2020-2024, smoothing recent events (Ukraine, Venezuela, post-Title&nbsp;42). Estimates have margins of error; reliability is shown per county in the tooltip.
+      </div>
     </div>
 
     <div id="geo-toggle">
@@ -488,9 +655,11 @@
       <div id="country-select-label">Show immigrants from</div>
       <select id="country-select"></select>
       <div id="mode-toggle">
-        <button class="mode-btn active" data-mode="pop">% of population</button>
+        <button class="mode-btn active" data-mode="pop">% of pop</button>
         <button class="mode-btn" data-mode="fb">Total counts</button>
+        <button class="mode-btn" data-mode="lq" disabled title="Pick a country to see Location Quotient — concentration relative to the national average">LQ</button>
       </div>
+      <div class="country-note" id="country-note" style="display:none"></div>
     </div>
 
     <div id="search-wrap">
@@ -509,6 +678,13 @@
       <div class="legend-ticks" id="legend-ticks">
         <span>0%</span><span></span><span></span>
       </div>
+      <div class="legend-benchmark" id="legend-bench"><span></span></div>
+      <div class="rel-legend">
+        Reliability:
+        <span class="rel-dot rel-good"></span>high
+        <span class="rel-dot rel-warn"></span>moderate
+        <span class="rel-dot rel-bad"></span>low
+      </div>
       <div class="data-note">
         Source: U.S. Census Bureau, ACS 5-year. Color scale uses quantile bins for visual contrast.
         Small-county estimates may have wide margins of error.
@@ -517,6 +693,62 @@
   </div>
 
   <div id="map"></div>
+</div>
+
+<div id="methodology-modal">
+  <div class="modal-card" style="position: relative;">
+    <button class="modal-close" id="modal-close-btn">&times;</button>
+    <h2>Methodology &amp; caveats</h2>
+    <div class="modal-sub">What this map does and doesn't show</div>
+
+    <h3>Source</h3>
+    <p>U.S. Census Bureau, American Community Survey (ACS) 5-year estimates, 2020&ndash;2024. County-level data from <code>B05002</code>, <code>B05006</code>, <code>B05001</code>, plus margins of error. Census tract data for the 10 largest cities from the same tables. National place-of-birth tabulations are at <a href="https://api.census.gov/data/2024/acs/acs5/groups/B05006.html" target="_blank">api.census.gov</a>.</p>
+
+    <h3>What "foreign-born" means here</h3>
+    <p>Place-of-birth, not ancestry. A naturalized citizen who arrived from India in 1985 counts toward "India." Their U.S.-born children do not &mdash; ACS doesn't tabulate parental nativity at county or tract level, so <strong>second-generation Americans are not visible on this map</strong>. The everyday meaning of "Italian-American" or "Vietnamese-American" includes both generations; this map only shows the first.</p>
+    <p>Naturalized citizens, lawful permanent residents, students, work-visa holders, and undocumented residents are all combined under "foreign-born." The ACS systematically <strong>undercounts undocumented residents</strong> by an unknown but real amount, so figures for areas with large undocumented populations (parts of the border, large urban hubs) are biased downward.</p>
+
+    <h3>The 5-year window</h3>
+    <p>ACS 5-year estimates are averages across 2020-2024. Major recent shifts &mdash; the post-COVID Asian-immigration drop, the Venezuelan and Haitian asylum surge, the Ukrainian war influx, and the 2023 Title 42 expiration &mdash; are all <strong>smoothed</strong> rather than visible. To see post-2022 changes specifically, you'd need single-year ACS estimates (which require 65,000+ population) or the 2023 5-year as a comparison baseline.</p>
+
+    <h3>Margins of error &amp; reliability</h3>
+    <p>Every ACS estimate carries a margin of error (MOE). For small countries in small counties, the MOE can exceed the estimate itself. The tooltip shows a colored dot indicating reliability based on the coefficient of variation:</p>
+    <ul>
+      <li><span class="rel-dot rel-good"></span> <strong>High</strong>: CV &lt; 15% &mdash; estimate is reliable</li>
+      <li><span class="rel-dot rel-warn"></span> <strong>Moderate</strong>: CV 15&ndash;30% &mdash; use with caution</li>
+      <li><span class="rel-dot rel-bad"></span> <strong>Low</strong>: CV &ge; 30% &mdash; estimate may be unreliable</li>
+    </ul>
+    <p>Tract-level estimates are <strong>much less reliable</strong> than county-level, especially for less common origins. We surface the same indicator at tract level; expect the dot to be red far more often.</p>
+
+    <h3>Location quotient (LQ)</h3>
+    <p>LQ measures <strong>concentration relative to the national average</strong>. An LQ of 1 means a county has the same share of foreign-born from country X as the U.S. as a whole. LQ = 5 means 5&times; more concentrated. LQ &lt; 1 means under-represented. LQ is the standard demographic measure for spotting ethnic enclaves and avoids the "everywhere is just LA and NYC" problem of raw counts. The 1.0 line is marked on the legend.</p>
+
+    <h3>Country definitions you should know</h3>
+    <ul>
+      <li><strong>China</strong> is split into three: mainland China (excl. Hong Kong &amp; Taiwan), Hong Kong, and Taiwan. ACS treats them separately; we now do too.</li>
+      <li><strong>Korea</strong> is not split N/S in ACS. In practice nearly all foreign-born residents from "Korea" are from South Korea.</li>
+      <li><strong>United Kingdom</strong> aggregates England, Scotland, Wales, and Northern Ireland (with Crown Dependencies); ACS publishes sub-totals but most users want the aggregate.</li>
+      <li><strong>Czechoslovakia</strong> hasn't existed since 1993, but ACS still publishes it as a single category for older immigrants who reported it.</li>
+    </ul>
+
+    <h3>Choropleth distortion</h3>
+    <p>Large rural counties visually shout louder than small urban ones. A 10,000-square-mile Nevada county with 4,000 immigrants looks bigger than Manhattan with 600,000. Keep scale in mind, especially in the Mountain West.</p>
+
+    <h3>Ecological fallacy warning</h3>
+    <p>A county at 25% foreign-born does not mean every neighborhood inside it is 25%. Use the "City zoom" mode to see tract-level variation inside the 10 largest cities. For other counties, internal variation can be substantial.</p>
+
+    <h3>What's <em>not</em> here (yet)</h3>
+    <ul>
+      <li>Year of entry (recent arrivals vs. established) &mdash; ACS publishes this in <code>B05005</code> with awkward bracket structure; punted for now.</li>
+      <li>Tract-level data for cities outside the top 10.</li>
+      <li>Bivariate cartograms or proportional symbols (proper area-correction).</li>
+      <li>Trend over time (would require multiple ACS years).</li>
+      <li>Second-generation Americans (would require PUMS-level analysis).</li>
+    </ul>
+
+    <h3>Code</h3>
+    <p>Open source: <a href="https://github.com/joshgreenman1973/foreign-born-map" target="_blank">github.com/joshgreenman1973/foreign-born-map</a></p>
+  </div>
 </div>
 
 <div id="tooltip">
@@ -532,12 +764,15 @@
   </div>
   <div class="tt-sub" id="tt-foreign-share"></div>
 
+  <div class="tt-citizenship" id="tt-citizenship" style="display:none"></div>
+
   <div class="tt-section tt-highlight" id="tt-country-block" style="display:none">
     <div class="tt-stat">
       <span class="tt-stat-label" style="color:inherit">Born in <span id="tt-clabel"></span></span>
       <span class="tt-stat-val" id="tt-ccount" style="color:inherit"></span>
     </div>
     <div class="tt-sub" id="tt-cpct"></div>
+    <div class="tt-rel-line" id="tt-creliab"></div>
   </div>
 
   <div class="tt-section" id="tt-top-block">
@@ -587,7 +822,9 @@ const REGIONS = [
     ['B05006_177E', 'Canada'],
   ]],
   ['Asia', [
-    ['B05006_049E', 'China'],
+    ['B05006_050E', 'China (mainland)'],
+    ['B05006_051E', 'Hong Kong'],
+    ['B05006_052E', 'Taiwan'],
     ['B05006_053E', 'Japan'],
     ['B05006_054E', 'Korea'],
     ['B05006_060E', 'India'],
@@ -697,6 +934,35 @@ REGIONS.forEach(([region, list]) => list.forEach(([v, name]) => {
   VAR_LABEL[v] = name;
 }));
 
+// Country footnotes — surface known data quirks when these are picked
+const COUNTRY_NOTES = {
+  'B05006_054E': 'ACS does not split North/South Korea. In practice nearly all "Korea" foreign-born are from South Korea.',
+  'B05006_008E': 'Aggregates England, Scotland, Wales, Northern Ireland, and Crown Dependencies.',
+  'B05006_034E': 'Czechoslovakia hasn\'t existed since 1993, but ACS still publishes the legacy category.',
+  'B05006_050E': 'Mainland China only (excludes Hong Kong and Taiwan, which appear separately).',
+  'B05006_051E': 'Hong Kong is reported separately from mainland China in ACS.',
+  'B05006_052E': 'Taiwan is reported separately from mainland China in ACS.',
+};
+
+// Search aliases — colloquial city/borough names → official county name fragments
+const SEARCH_ALIASES = {
+  'brooklyn': 'Kings County',
+  'manhattan': 'New York County',
+  'staten island': 'Richmond County',
+  'queens borough': 'Queens County',
+  'the bronx': 'Bronx County',
+  'd.c.': 'District of Columbia',
+  'dc': 'District of Columbia',
+  'nyc': 'Bronx,Kings,New York,Queens,Richmond',
+  'la county': 'Los Angeles County',
+  'silicon valley': 'Santa Clara',
+  'bay area': 'Alameda,Contra Costa,Marin,San Francisco,San Mateo,Santa Clara',
+  'south florida': 'Miami-Dade,Broward,Palm Beach',
+};
+
+// National-share lookup, computed once data is loaded — used for LQ
+const NATIONAL_SHARE = {};
+
 // Cities config: id, display name, county FIPS that make up the city's coverage area
 const CITIES = [
   { id: 'nyc',          name: 'New York',     counties: ['36005','36047','36061','36081','36085'] },
@@ -789,13 +1055,91 @@ function updateLegend() {
   document.getElementById('legend-bar').style.background =
     `linear-gradient(to right, ${COLOR_STOPS.join(',')})`;
   const ticks = document.getElementById('legend-ticks');
-  if (!breakValues.length) { ticks.innerHTML = '<span>0%</span><span></span><span></span>'; return; }
-  const fmt = v => v >= 10 ? v.toFixed(0) + '%' : v.toFixed(1) + '%';
+  const benchEl = document.getElementById('legend-bench');
+  const benchSpan = benchEl.querySelector('span');
+  if (!breakValues.length) {
+    ticks.innerHTML = '<span>0%</span><span></span><span></span>';
+    benchEl.style.setProperty('--bench-pos', '50%');
+    benchSpan.textContent = '';
+    return;
+  }
+  const isLQ = (viewMode === 'lq' && currentVar !== 'ALL');
+  const fmt = v => isLQ
+    ? (v >= 10 ? v.toFixed(1) + '×' : v.toFixed(2) + '×')
+    : (v >= 10 ? v.toFixed(0) + '%' : v.toFixed(1) + '%');
   const lowEnd = Math.floor(breakValues.length * 0.55) - 1;
   const lo = 0;
-  const mid = breakValues[Math.max(0, lowEnd)];     // boundary between "main" and "high" range
-  const hi  = breakValues[breakValues.length - 1];  // top break
+  const mid = breakValues[Math.max(0, lowEnd)];
+  const hi  = breakValues[breakValues.length - 1];
   ticks.innerHTML = `<span>${fmt(lo)}</span><span>${fmt(mid)}</span><span>${fmt(hi)}+</span>`;
+
+  // Benchmark line: U.S. national average for current view
+  let benchVal = null, benchLabel = '';
+  if (currentVar === 'ALL') {
+    benchVal = NATIONAL_SHARE._allShareOfPop;
+    benchLabel = `U.S. avg ${benchVal.toFixed(1)}%`;
+  } else if (viewMode === 'pop') {
+    // National pct of pop from country X = totals[var] / total US pop
+    let totalUSPop = 0;
+    for (const f in countyDataAll) totalUSPop += countyDataAll[f].pop || 0;
+    const natShareOfPop = NATIONAL_SHARE[currentVar] && NATIONAL_SHARE._totalFB && totalUSPop
+      ? (NATIONAL_SHARE[currentVar] * NATIONAL_SHARE._totalFB) / totalUSPop * 100 : 0;
+    benchVal = natShareOfPop;
+    benchLabel = `U.S. avg ${benchVal.toFixed(2)}%`;
+  } else if (viewMode === 'fb') {
+    benchVal = (NATIONAL_SHARE[currentVar] || 0) * 100;
+    benchLabel = `U.S. avg ${benchVal.toFixed(1)}%`;
+  } else if (viewMode === 'lq') {
+    benchVal = 1.0;
+    benchLabel = 'U.S. avg (LQ = 1.0)';
+  }
+  if (benchVal !== null && benchVal > 0) {
+    // Map benchVal onto the gradient using the same break logic
+    let pos = 0;
+    if (benchVal <= breakValues[0]) {
+      pos = (benchVal / breakValues[0]) * (1 / (COLOR_STOPS.length));
+    } else if (benchVal >= hi) {
+      pos = 1;
+    } else {
+      for (let i = 0; i < breakValues.length - 1; i++) {
+        if (benchVal >= breakValues[i] && benchVal <= breakValues[i+1]) {
+          const t = (benchVal - breakValues[i]) / (breakValues[i+1] - breakValues[i]);
+          pos = (i + 1 + t) / COLOR_STOPS.length;
+          break;
+        }
+      }
+    }
+    pos = Math.max(0.02, Math.min(0.98, pos));
+    benchEl.style.setProperty('--bench-pos', (pos * 100).toFixed(1) + '%');
+    benchSpan.textContent = benchLabel;
+  } else {
+    benchEl.style.setProperty('--bench-pos', '50%');
+    benchSpan.textContent = '';
+  }
+}
+
+// ----- compute national shares (for LQ) -----
+function computeNationalShares() {
+  // Sum from countyDataAll. LQ = (local share of FB from X) / (national share of FB from X)
+  let totalFB = 0;
+  const totals = {};
+  for (const fips in countyDataAll) {
+    const d = countyDataAll[fips];
+    if (d.foreign > 0) totalFB += d.foreign;
+    COUNTRY_VARS.forEach(v => {
+      const n = d[v];
+      if (n > 0) totals[v] = (totals[v] || 0) + n;
+    });
+  }
+  COUNTRY_VARS.forEach(v => {
+    NATIONAL_SHARE[v] = totalFB > 0 ? (totals[v] || 0) / totalFB : 0;
+  });
+  NATIONAL_SHARE._totalFB = totalFB;
+  NATIONAL_SHARE._allShareOfPop = (() => {
+    let pop = 0;
+    for (const fips in countyDataAll) pop += countyDataAll[fips].pop || 0;
+    return pop > 0 ? totalFB / pop * 100 : 0;
+  })();
 }
 
 // ----- compute -----
@@ -809,12 +1153,35 @@ function getRawPct(fips) {
   }
   const n = d[currentVar];
   if (n === null || n === undefined || n < 0) return null;
+
+  if (viewMode === 'lq') {
+    if (!d.foreign || d.foreign <= 0) return null;
+    const localShare = n / d.foreign;
+    const natShare = NATIONAL_SHARE[currentVar];
+    if (!natShare || natShare <= 0) return null;
+    return localShare / natShare;  // LQ — unitless, 1.0 = national average
+  }
   if (viewMode === 'fb') {
     if (!d.foreign || d.foreign <= 0) return null;
     return (n / d.foreign) * 100;
   }
   if (!d.pop || d.pop <= 0) return null;
   return (n / d.pop) * 100;
+}
+
+// Reliability classification based on coefficient of variation
+function reliabilityClass(estimate, moe) {
+  if (estimate === undefined || estimate === null || estimate < 0) return null;
+  if (estimate === 0) return 'na';
+  if (moe === undefined || moe === null || moe < 0) return null;
+  // ACS uses 90% CI: SE = MOE / 1.645. CV = SE / estimate.
+  const cv = (moe / 1.645) / estimate;
+  if (cv < 0.15) return 'good';
+  if (cv < 0.30) return 'warn';
+  return 'bad';
+}
+function reliabilityText(cls) {
+  return { good: 'reliable', warn: 'use with caution', bad: 'low reliability', na: 'no data' }[cls] || '';
 }
 
 // ----- map render -----
@@ -840,6 +1207,8 @@ function updateLegendLabel() {
   const el = document.getElementById('legend-label');
   if (currentVar === 'ALL') {
     el.textContent = 'Map color: % of county population that is foreign-born';
+  } else if (viewMode === 'lq') {
+    el.textContent = `Map color: location quotient (LQ) for ${currentLabel} — concentration vs. U.S. average`;
   } else if (viewMode === 'fb') {
     el.textContent = `Map color: % of foreign-born population from ${currentLabel}`;
   } else {
@@ -851,9 +1220,8 @@ function updateLegendLabel() {
 function buildTopCountiesList() {
   const container = document.getElementById('top-counties-section');
   const isAll = currentVar === 'ALL';
+  const isLQ = (viewMode === 'lq' && !isAll);
   const sortByPct = (viewMode === 'pop');
-
-  // Filter: skip tiny units when sorting by % to avoid statistically noisy estimates
   const isCityMode = (geoLevel === 'city');
   const minPop = sortByPct ? (isCityMode ? 800 : 5000) : 50;
 
@@ -864,15 +1232,23 @@ function buildTopCountiesList() {
     if (n > 0 && d.pop > minPop) {
       const denom = (!isAll && viewMode === 'fb') ? d.foreign : d.pop;
       const pct = denom > 0 ? (n / denom) * 100 : 0;
-      entries.push({ fips, d, n, pct });
+      let lq = null;
+      if (!isAll && d.foreign > 0 && NATIONAL_SHARE[currentVar] > 0) {
+        lq = (n / d.foreign) / NATIONAL_SHARE[currentVar];
+      }
+      // Reliability flag — used to filter the bottom list
+      const moe = isAll ? d.foreign_m : d[currentVar.replace('E','M')];
+      const rel = reliabilityClass(n, moe);
+      entries.push({ fips, d, n, pct, lq, rel });
     }
   }
-  if (sortByPct) entries.sort((a, b) => b.pct - a.pct);
+  if (isLQ) entries.sort((a, b) => (b.lq || 0) - (a.lq || 0));
+  else if (sortByPct) entries.sort((a, b) => b.pct - a.pct);
   else entries.sort((a, b) => b.n - a.n);
 
   let html = '';
-  const primaryKey = sortByPct ? 'pct' : 'n';
-  const sortLabel = sortByPct ? 'by % of population' : 'by total count';
+  const primaryKey = isLQ ? 'lq' : (sortByPct ? 'pct' : 'n');
+  const sortLabel = isLQ ? 'by location quotient' : (sortByPct ? 'by % of population' : 'by total count');
   const isCity = (geoLevel === 'city');
   const cityName = isCity ? (CITIES.find(c => c.id === currentCity)?.name || '') : '';
   const unitLabel = isCity ? 'tracts' : 'counties';
@@ -881,13 +1257,15 @@ function buildTopCountiesList() {
 
   if (isAll) {
     const top = entries.slice(0, topN);
-    const bot = entries.slice(-botN).reverse();
+    // For bottom: only include reliable estimates (filter out the noise)
+    const reliableBot = entries.filter(e => e.rel === 'good' || e.rel === 'warn');
+    const bot = reliableBot.slice(-botN).reverse();
     const topMax = top.length ? top[0][primaryKey] : 0;
     const botMax = bot.length ? bot[0][primaryKey] : 0;
     const cityTag = isCity ? ` in <em>${cityName}</em>` : '';
     html += `<div class="tc-header">Top ${topN} ${unitLabel}${cityTag} &mdash; <em>most foreign-born</em> &middot; ${sortLabel}</div>`;
     html += renderRows(top, 1, topMax);
-    html += `<div class="tc-header">Bottom ${botN} ${unitLabel}${cityTag} &mdash; <em>fewest (with any)</em></div>`;
+    html += `<div class="tc-header">Bottom ${bot.length} ${unitLabel}${cityTag} &mdash; <em>fewest (reliable estimates only)</em></div>`;
     html += renderRows(bot, 1, botMax, { bottom: true });
   } else {
     const top = entries.slice(0, topN);
@@ -908,18 +1286,32 @@ function buildTopCountiesList() {
 
 function renderRows(arr, startRank, maxPrimary, opts = {}) {
   const klass = opts.bottom ? ' bottom-row' : '';
+  const isAll = (currentVar === 'ALL');
+  const isLQ = (viewMode === 'lq' && !isAll);
   const primaryIsPct = (viewMode === 'pop');
   return arr.map((e, i) => {
     const pctStr = e.pct >= 10 ? e.pct.toFixed(0) + '%' : e.pct.toFixed(1) + '%';
     const countStr = e.n.toLocaleString();
-    const primaryStr   = primaryIsPct ? pctStr : countStr;
-    const secondaryStr = primaryIsPct ? countStr : pctStr;
-    // Bar width: scale by primary metric (sqrt to give smaller rows visibility)
-    const primaryVal = primaryIsPct ? e.pct : e.n;
+    const lqStr = e.lq != null ? (e.lq >= 10 ? e.lq.toFixed(1) + '×' : e.lq.toFixed(2) + '×') : '—';
+    let primaryStr, secondaryStr, primaryVal;
+    if (isLQ) {
+      primaryStr = lqStr;
+      secondaryStr = countStr;
+      primaryVal = e.lq || 0;
+    } else if (primaryIsPct) {
+      primaryStr = pctStr;
+      secondaryStr = countStr;
+      primaryVal = e.pct;
+    } else {
+      primaryStr = countStr;
+      secondaryStr = pctStr;
+      primaryVal = e.n;
+    }
     const barW = maxPrimary > 0 ? Math.max(2, Math.sqrt(primaryVal / maxPrimary) * 100) : 0;
+    const relDot = e.rel ? `<span class="rel-dot rel-${e.rel}" style="margin-right:5px"></span>` : '';
     return `<div class="top-county${klass}" data-fips="${e.fips}" style="--bar-w: ${barW.toFixed(1)}%">
       <span class="tc-rank">${startRank + i}.</span>
-      <span class="tc-name" title="${e.d.name}">${e.d.name}</span>
+      <span class="tc-name" title="${e.d.name}">${relDot}${e.d.name}</span>
       <span class="tc-stat">${primaryStr}<span class="tc-pct">${secondaryStr}</span></span>
     </div>`;
   }).join('');
@@ -958,18 +1350,43 @@ function showTooltip(e, feature) {
     fShareEl.style.display = 'none';
   }
 
+  // Citizenship breakdown — naturalized vs. non-citizen
+  const citEl = document.getElementById('tt-citizenship');
+  if (d.naturalized > 0 || d.noncitizen > 0) {
+    const fbCit = (d.naturalized || 0) + (d.noncitizen || 0);
+    if (fbCit > 0) {
+      const natPct = ((d.naturalized || 0) / fbCit * 100).toFixed(0);
+      const ncPct  = ((d.noncitizen || 0) / fbCit * 100).toFixed(0);
+      citEl.innerHTML = `<strong>Naturalized:</strong> ${natPct}% &middot; <strong>Non-citizen:</strong> ${ncPct}%`;
+      citEl.style.display = 'block';
+    } else { citEl.style.display = 'none'; }
+  } else { citEl.style.display = 'none'; }
+
   const cb = document.getElementById('tt-country-block');
   if (currentVar !== 'ALL') {
     const n = d[currentVar];
-    let pctText = '';
+    const moe = d[currentVar.replace('E','M')];
+    let lines = [];
     if (n >= 0) {
-      const ofPop = d.pop > 0 ? ((n / d.pop) * 100).toFixed(2) + '% of total population' : null;
-      const ofFb  = d.foreign > 0 ? ((n / d.foreign) * 100).toFixed(1) + '% of foreign-born' : null;
-      pctText = [ofPop, ofFb].filter(Boolean).join(' &middot; ');
+      if (d.pop > 0) lines.push(`${((n / d.pop) * 100).toFixed(2)}% of total population`);
+      if (d.foreign > 0) lines.push(`${((n / d.foreign) * 100).toFixed(1)}% of foreign-born`);
+      if (d.foreign > 0 && NATIONAL_SHARE[currentVar] > 0) {
+        const lq = (n / d.foreign) / NATIONAL_SHARE[currentVar];
+        lines.push(`LQ ${lq.toFixed(2)}× U.S. avg`);
+      }
     }
     document.getElementById('tt-clabel').textContent = currentLabel;
     document.getElementById('tt-ccount').textContent = n >= 0 ? n.toLocaleString() : 'N/A';
-    document.getElementById('tt-cpct').innerHTML = pctText || 'N/A';
+    document.getElementById('tt-cpct').innerHTML = lines.join(' &middot; ') || 'N/A';
+
+    const rel = reliabilityClass(n, moe);
+    const relEl = document.getElementById('tt-creliab');
+    if (rel) {
+      const moeStr = moe >= 0 ? `±${Math.round(moe).toLocaleString()}` : '';
+      relEl.innerHTML = `<span class="rel-dot rel-${rel}"></span>${reliabilityText(rel)} ${moeStr}`;
+    } else {
+      relEl.innerHTML = '';
+    }
     cb.style.display = 'block';
   } else {
     cb.style.display = 'none';
@@ -1027,14 +1444,19 @@ async function fetchOneBatch(vars) {
 }
 
 async function loadCensusData() {
-  // Always-needed vars first batch (3 base) + remaining country vars, split into chunks of <=46 vars
+  // Existing 94 country E vars (excluding the new China-mainland/HK/Taiwan, which come from supp file)
+  const existingCountryVars = COUNTRY_VARS.filter(v =>
+    !['B05006_050E','B05006_051E','B05006_052E'].includes(v));
   const baseVars = ['B05002_001E', 'B05006_001E'];
-  const allVars = [...baseVars, ...COUNTRY_VARS]; // 96 vars
+  const allVars = [...baseVars, ...existingCountryVars];
   const batches = chunk(allVars, 46);
 
-  const results = await Promise.all(batches.map(fetchOneBatch));
-  const merged = {};
+  const [results, suppData] = await Promise.all([
+    Promise.all(batches.map(fetchOneBatch)),
+    fetch('county-supp-data.json').then(r => r.json()).catch(() => ({})),
+  ]);
 
+  const merged = {};
   results.forEach(rows => {
     const headers = rows[0];
     const stateIdx = headers.indexOf('state');
@@ -1052,17 +1474,25 @@ async function loadCensusData() {
     }
   });
 
-  // Normalize keys
+  // Normalize + merge supp data (MOE, HK/Taiwan/Mainland, citizenship)
   const out = {};
   for (const fips in merged) {
     const m = merged[fips];
+    const supp = suppData[fips] || {};
     out[fips] = {
       name: m.name,
       pop: m['B05002_001E'] || 0,
+      pop_m: supp['B05002_001M'],
       foreign: m['B05006_001E'] !== undefined ? m['B05006_001E'] : -1,
+      foreign_m: supp['B05006_001M'],
+      naturalized: supp['B05001_005E'],
+      noncitizen: supp['B05001_006E'],
     };
     COUNTRY_VARS.forEach(v => {
-      out[fips][v] = m[v] !== undefined ? m[v] : -1;
+      const e = m[v] !== undefined ? m[v] : (supp[v] !== undefined ? supp[v] : -1);
+      out[fips][v] = e;
+      const mvar = v.replace('E','M');
+      out[fips][mvar] = supp[mvar];
     });
   }
   return out;
@@ -1084,6 +1514,28 @@ function buildCountryDropdown() {
   sel.addEventListener('change', () => {
     currentVar = sel.value;
     currentLabel = currentVar === 'ALL' ? 'All countries' : VAR_LABEL[currentVar];
+
+    // LQ button only meaningful when a country is picked
+    const lqBtn = document.querySelector('.mode-btn[data-mode="lq"]');
+    if (currentVar === 'ALL') {
+      lqBtn.disabled = true;
+      if (viewMode === 'lq') {
+        viewMode = 'pop';
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === 'pop'));
+      }
+    } else {
+      lqBtn.disabled = false;
+    }
+
+    // Country footnote
+    const note = document.getElementById('country-note');
+    if (COUNTRY_NOTES[currentVar]) {
+      note.textContent = COUNTRY_NOTES[currentVar];
+      note.style.display = 'block';
+    } else {
+      note.style.display = 'none';
+    }
+
     updateLegendLabel();
     updateMap();
     buildTopCountiesList();
@@ -1110,9 +1562,27 @@ const searchResults = document.getElementById('search-results');
 function runSearch(q) {
   q = q.trim().toLowerCase();
   if (q.length < 2) { searchResults.style.display = 'none'; return; }
+
+  // Resolve aliases. Aliases may map to a comma-separated list of fragments.
+  let needles = [q];
+  if (SEARCH_ALIASES[q]) {
+    needles = SEARCH_ALIASES[q].toLowerCase().split(',').map(s => s.trim());
+  } else {
+    // Partial alias match (e.g. "brook" → "brooklyn" → "Kings County")
+    for (const k in SEARCH_ALIASES) {
+      if (k.startsWith(q) || q.startsWith(k)) {
+        needles = needles.concat(SEARCH_ALIASES[k].toLowerCase().split(',').map(s => s.trim()));
+      }
+    }
+  }
+
   const matches = [];
+  const seen = new Set();
   for (const fips in activeData) {
-    if (activeData[fips].name.toLowerCase().includes(q)) {
+    const lname = activeData[fips].name.toLowerCase();
+    if (needles.some(n => lname.includes(n))) {
+      if (seen.has(fips)) continue;
+      seen.add(fips);
       matches.push({ fips, name: activeData[fips].name });
       if (matches.length >= 30) break;
     }
@@ -1164,18 +1634,30 @@ async function loadTractDataIfNeeded() {
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('loading-msg').textContent = 'Loading neighborhood-level data...';
   try {
-    const [data, topo] = await Promise.all([
+    const [data, supp, topo] = await Promise.all([
       fetch('city-tracts-data.json').then(r => r.json()),
+      fetch('tract-supp-data.json').then(r => r.json()).catch(() => ({})),
       fetch('city-tracts.topojson').then(r => r.json()),
     ]);
-    // Normalize: source uses {n: name, B05002_001E: ..., B05006_xxxE: ...}
     const normalized = {};
     for (const geoid in data) {
       const m = data[geoid];
-      const obj = { name: m.n, pop: m['B05002_001E'] || 0, foreign: m['B05006_001E'] };
+      const s = supp[geoid] || {};
+      const obj = {
+        name: m.n,
+        pop: m['B05002_001E'] || 0,
+        pop_m: s['B05002_001M'],
+        foreign: m['B05006_001E'],
+        foreign_m: s['B05006_001M'],
+        naturalized: s['B05001_005E'],
+        noncitizen: s['B05001_006E'],
+      };
       if (obj.foreign === undefined || obj.foreign === null) obj.foreign = -1;
       COUNTRY_VARS.forEach(v => {
-        obj[v] = m[v] !== undefined ? m[v] : -1;
+        const e = m[v] !== undefined ? m[v] : (s[v] !== undefined ? s[v] : -1);
+        obj[v] = e;
+        const mv = v.replace('E','M');
+        obj[mv] = s[mv];
       });
       normalized[geoid] = obj;
     }
@@ -1296,10 +1778,24 @@ function hookGeoToggle() {
   });
 }
 
+// ----- methodology modal -----
+function hookMethodologyModal() {
+  const modal = document.getElementById('methodology-modal');
+  document.getElementById('methodology-link').addEventListener('click', () => modal.classList.add('shown'));
+  document.getElementById('modal-close-btn').addEventListener('click', () => modal.classList.remove('shown'));
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('shown');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') modal.classList.remove('shown');
+  });
+}
+
 // ----- init -----
 buildCountryDropdown();
 buildCitySelect();
 hookGeoToggle();
+hookMethodologyModal();
 
 let countyTopoCached = null;
 let countyGeojsonCached = null;
@@ -1347,6 +1843,7 @@ function setupCountyLayer(topo, geojson) {
     ]);
     countyDataAll = data;
     activeData = data;
+    computeNationalShares();
     countyTopoCached = topo;
     const topoKey = Object.keys(topo.objects)[0];
     countyGeojsonCached = topojson.feature(topo, topo.objects[topoKey]);
