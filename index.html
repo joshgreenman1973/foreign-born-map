@@ -198,6 +198,25 @@
     .mode-btn:disabled { opacity: 0.35; cursor: not-allowed; }
     .mode-btn:disabled:hover { background: transparent; color: var(--text-2); }
 
+    #circle-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 11.5px;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: border-color 0.12s;
+      user-select: none;
+    }
+    #circle-toggle:hover { border-color: #3a4150; }
+    #circle-toggle input { margin: 0; cursor: pointer; accent-color: var(--accent); }
+    #circle-toggle strong { color: var(--text); font-weight: 600; }
+
     #search-wrap {
       position: relative;
       margin: 14px 22px 0;
@@ -481,6 +500,31 @@
       line-height: 1.5;
     }
     #tooltip .tt-citizenship strong { color: var(--text-2); font-weight: 600; }
+    #tooltip .tt-citizenship > div { margin-bottom: 5px; }
+    #tooltip .tt-citizenship > div:last-child { margin-bottom: 0; }
+    #tooltip .tt-yoe-label {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      font-weight: 600;
+      margin: 6px 0 3px;
+    }
+    #tooltip .tt-yoe-row {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: #d1d5db;
+    }
+    #tooltip .tt-yoe-row strong {
+      color: var(--text-3);
+      font-weight: 600;
+      margin-right: 3px;
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: 10px;
+    }
     #tooltip .tt-rel-line {
       font-size: 10.5px;
       color: var(--text-3);
@@ -683,6 +727,10 @@
         <button class="mode-btn" data-mode="lq" disabled title="Pick a country to see Location Quotient — concentration relative to the national average">LQ</button>
       </div>
       <div class="country-note" id="country-note" style="display:none"></div>
+      <label id="circle-toggle" title="Show proportional symbols sized by raw count — corrects for the choropleth area distortion that makes large rural counties dominate visually.">
+        <input type="checkbox" id="circle-toggle-input">
+        <span>Overlay <strong>proportional dots</strong> sized by count</span>
+      </label>
     </div>
 
     <div id="search-wrap">
@@ -762,11 +810,15 @@
 
     <h3>What's <em>not</em> here (yet)</h3>
     <ul>
-      <li>Year of entry (recent arrivals vs. established) &mdash; ACS publishes this in <code>B05005</code> with awkward bracket structure; punted for now.</li>
       <li>Tract-level data for cities outside the top 10.</li>
-      <li>Bivariate cartograms or proportional symbols (proper area-correction).</li>
-      <li>Trend over time (would require multiple ACS years).</li>
-      <li>Second-generation Americans (would require PUMS-level analysis).</li>
+      <li>Trend over time (would require comparing multiple ACS year vintages).</li>
+      <li>Second-generation Americans (would require PUMS-level analysis &mdash; ACS doesn't tabulate parental nativity at county or tract geography).</li>
+    </ul>
+
+    <h3>What's been added (recent)</h3>
+    <ul>
+      <li><strong>Year of arrival</strong> shown in the tooltip when hovering a county (four buckets: 2010+, 2000s, 1990s, pre-1990) or a city tract (binary recent / established split).</li>
+      <li><strong>Proportional symbols overlay</strong> (toggle "Overlay proportional dots") &mdash; circle area scales with raw count, correcting the choropleth's area distortion that makes large rural counties shout louder than small dense ones.</li>
     </ul>
 
     <h3>Code</h3>
@@ -1018,6 +1070,9 @@ let layerByFips = {};
 let stateMeshLayer = null;
 let colorScale = null;
 let breakValues = [];
+let showCircles = false;
+let circleLayer = null;
+let countyYoeData = null;  // year-of-entry data for counties (loaded on demand)
 
 // ----- map setup -----
 const map = L.map('map', { center: [38.5, -97], zoom: 4, zoomSnap: 0.5, preferCanvas: true });
@@ -1062,6 +1117,11 @@ const NO_DATA_COLOR = '#252b35';
 // mode — which is what users expect intuitively. We only fall back to quantile
 // bins for country-specific or LQ modes where the value range varies wildly.
 const FIXED_PCT_BREAKS = [0.5, 1, 2, 3, 4, 5, 7, 9, 12, 15, 18, 22, 26, 30, 35, 40, 45, 50, 55];
+
+// Proportional symbol map (cartogram alternative): circle radius scales with raw count
+const CIRCLE_MAX_RADIUS = { national: 22, city: 9 };
+const CIRCLE_FILL = 'rgba(251, 191, 119, 0.85)';   // soft amber, distinct from inferno
+const CIRCLE_STROKE = 'rgba(15, 18, 24, 0.9)';
 function buildColorScale() {
   const isAllFB = (currentVar === 'ALL' && viewMode === 'pop');
   if (isAllFB) {
@@ -1238,6 +1298,75 @@ function updateMap() {
   buildColorScale();
   updateLegend();
   if (geoLayer) geoLayer.setStyle(styleFeature);
+  renderCircles();
+}
+
+// ----- proportional symbol overlay -----
+// Address #9 (choropleth area distortion) by overlaying circles sized by raw
+// count. Square-root scaling: visual area is proportional to count.
+function getCircleCount(fips) {
+  const d = activeData[fips];
+  if (!d) return 0;
+  if (currentVar === 'ALL') return d.foreign > 0 ? d.foreign : 0;
+  const v = d[currentVar];
+  return v > 0 ? v : 0;
+}
+
+function renderCircles() {
+  // Clear old layer regardless of toggle state
+  if (circleLayer) {
+    map.removeLayer(circleLayer);
+    circleLayer = null;
+  }
+  if (!showCircles || !activeData) return;
+
+  const isCity = (geoLevel === 'city');
+  const maxR = isCity ? CIRCLE_MAX_RADIUS.city : CIRCLE_MAX_RADIUS.national;
+
+  // Find max count for scaling
+  let maxN = 0;
+  for (const fips in activeData) {
+    const n = getCircleCount(fips);
+    if (n > maxN) maxN = n;
+  }
+  if (maxN <= 0) return;
+
+  if (!map.getPane('proportional-symbols')) {
+    const p = map.createPane('proportional-symbols');
+    p.style.zIndex = 645; // above choropleth (default 400) and state mesh (640), below labels (650)
+  }
+
+  const markers = [];
+  for (const fips in activeData) {
+    const n = getCircleCount(fips);
+    if (n <= 0) continue;
+    const layer = layerByFips[fips];
+    if (!layer) continue;
+    const center = layer.getBounds().getCenter();
+    // Filter out tiny dots that just add noise
+    const r = Math.sqrt(n / maxN) * maxR;
+    if (r < 1.2) continue;
+    const m = L.circleMarker(center, {
+      radius: r,
+      fillColor: CIRCLE_FILL,
+      fillOpacity: 0.78,
+      color: CIRCLE_STROKE,
+      weight: 0.8,
+      opacity: 0.9,
+      pane: 'proportional-symbols',
+      interactive: false,
+    });
+    markers.push(m);
+  }
+  circleLayer = L.layerGroup(markers).addTo(map);
+}
+
+function hookCircleToggle() {
+  const cb = document.getElementById('circle-toggle-input');
+  cb.addEventListener('change', () => {
+    showCircles = cb.checked;
+    renderCircles();
+  });
 }
 
 // ----- legend label -----
@@ -1392,15 +1521,50 @@ function showTooltip(e, feature) {
 
   // Citizenship breakdown — naturalized vs. non-citizen
   const citEl = document.getElementById('tt-citizenship');
+  let citizenshipLine = '';
   if (d.naturalized > 0 || d.noncitizen > 0) {
     const fbCit = (d.naturalized || 0) + (d.noncitizen || 0);
     if (fbCit > 0) {
       const natPct = ((d.naturalized || 0) / fbCit * 100).toFixed(0);
       const ncPct  = ((d.noncitizen || 0) / fbCit * 100).toFixed(0);
-      citEl.innerHTML = `<strong>Naturalized:</strong> ${natPct}% &middot; <strong>Non-citizen:</strong> ${ncPct}%`;
-      citEl.style.display = 'block';
-    } else { citEl.style.display = 'none'; }
-  } else { citEl.style.display = 'none'; }
+      citizenshipLine = `<strong>Naturalized:</strong> ${natPct}% &middot; <strong>Non-citizen:</strong> ${ncPct}%`;
+    }
+  }
+
+  // Year of arrival — 4 buckets at county level, 2 at tract level
+  let yoeLine = '';
+  if (d.foreign > 0) {
+    if (d.yoe_2010plus !== undefined && d.yoe_2000s !== undefined) {
+      // County-level: 4 buckets
+      const total = (d.yoe_2010plus || 0) + (d.yoe_2000s || 0) + (d.yoe_1990s || 0) + (d.yoe_pre1990 || 0);
+      if (total > 0) {
+        const p = n => Math.round((n / total) * 100);
+        yoeLine = `<div class="tt-yoe-label">Year of arrival (foreign-born)</div>` +
+          `<div class="tt-yoe-row">` +
+            `<span><strong>2010+</strong> ${p(d.yoe_2010plus || 0)}%</span>` +
+            `<span><strong>2000s</strong> ${p(d.yoe_2000s || 0)}%</span>` +
+            `<span><strong>1990s</strong> ${p(d.yoe_1990s || 0)}%</span>` +
+            `<span><strong>pre-1990</strong> ${p(d.yoe_pre1990 || 0)}%</span>` +
+          `</div>`;
+      }
+    } else if (d.yoe_2010plus !== undefined && d.yoe_2010plus > 0 && d.foreign > 0) {
+      // Tract-level: only 2010+ available, infer established
+      const recPct = Math.round((d.yoe_2010plus / d.foreign) * 100);
+      const estPct = 100 - recPct;
+      yoeLine = `<div class="tt-yoe-label">Year of arrival (foreign-born)</div>` +
+        `<div class="tt-yoe-row">` +
+          `<span><strong>2010+</strong> ${recPct}%</span>` +
+          `<span><strong>before 2010</strong> ${estPct}%</span>` +
+        `</div>`;
+    }
+  }
+
+  if (citizenshipLine || yoeLine) {
+    citEl.innerHTML = (citizenshipLine ? `<div>${citizenshipLine}</div>` : '') + yoeLine;
+    citEl.style.display = 'block';
+  } else {
+    citEl.style.display = 'none';
+  }
 
   const cb = document.getElementById('tt-country-block');
   if (currentVar !== 'ALL') {
@@ -1491,10 +1655,12 @@ async function loadCensusData() {
   const allVars = [...baseVars, ...existingCountryVars];
   const batches = chunk(allVars, 46);
 
-  const [results, suppData] = await Promise.all([
+  const [results, suppData, yoeData] = await Promise.all([
     Promise.all(batches.map(fetchOneBatch)),
     fetch('county-supp-data.json').then(r => r.json()).catch(() => ({})),
+    fetch('county-yoe-data.json').then(r => r.json()).catch(() => ({})),
   ]);
+  countyYoeData = yoeData;
 
   const merged = {};
   results.forEach(rows => {
@@ -1519,6 +1685,7 @@ async function loadCensusData() {
   for (const fips in merged) {
     const m = merged[fips];
     const supp = suppData[fips] || {};
+    const yoe = (yoeData && yoeData[fips]) || {};
     out[fips] = {
       name: m.name,
       pop: m['B05002_001E'] || 0,
@@ -1527,6 +1694,11 @@ async function loadCensusData() {
       foreign_m: supp['B05006_001M'],
       naturalized: supp['B05001_005E'],
       noncitizen: supp['B05001_006E'],
+      // Year of entry (foreign-born, four buckets)
+      yoe_2010plus: yoe['B05005_004E'],
+      yoe_2000s:    yoe['B05005_009E'],
+      yoe_1990s:    yoe['B05005_014E'],
+      yoe_pre1990:  yoe['B05005_019E'],
     };
     COUNTRY_VARS.forEach(v => {
       const e = m[v] !== undefined ? m[v] : (supp[v] !== undefined ? supp[v] : -1);
@@ -1691,6 +1863,8 @@ async function loadTractDataIfNeeded() {
         foreign_m: s['B05006_001M'],
         naturalized: s['B05001_005E'],
         noncitizen: s['B05001_006E'],
+        // Tract data has only the 2010+ bracket; we infer "established" as the rest
+        yoe_2010plus: s['B05005_004E'],
       };
       if (obj.foreign === undefined || obj.foreign === null) obj.foreign = -1;
       COUNTRY_VARS.forEach(v => {
@@ -1836,6 +2010,7 @@ buildCountryDropdown();
 buildCitySelect();
 hookGeoToggle();
 hookMethodologyModal();
+hookCircleToggle();
 
 let countyTopoCached = null;
 let countyGeojsonCached = null;
