@@ -863,7 +863,6 @@
 </div>
 
 <script>
-const CENSUS_KEY = '';
 const ACS_YEAR = '2024';
 
 // Country list grouped by region. Each entry: [varCode, displayName]
@@ -1632,53 +1631,16 @@ function positionTooltip(e) {
 }
 
 // ----- data fetch -----
-function chunk(arr, size) {
-  const out = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-}
-
-async function fetchOneBatch(vars) {
-  const get = ['NAME', ...vars].join(',');
-  const key = CENSUS_KEY ? `&key=${CENSUS_KEY}` : '';
-  const url = `https://api.census.gov/data/${ACS_YEAR}/acs/acs5?get=${get}&for=county:*&in=state:*${key}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Census API ${res.status}`);
-  return res.json();
-}
 
 async function loadCensusData() {
-  // Existing 94 country E vars (excluding the new China-mainland/HK/Taiwan, which come from supp file)
-  const existingCountryVars = COUNTRY_VARS.filter(v =>
-    !['B05006_050E','B05006_051E','B05006_052E'].includes(v));
-  const baseVars = ['B05002_001E', 'B05006_001E'];
-  const allVars = [...baseVars, ...existingCountryVars];
-  const batches = chunk(allVars, 46);
-
-  const [results, suppData, yoeData] = await Promise.all([
-    Promise.all(batches.map(fetchOneBatch)),
+  // County base data is baked into a static file so the page no longer depends
+  // on the live Census API (which now requires an API key). See bake_county_data.py.
+  const [merged, suppData, yoeData] = await Promise.all([
+    fetch('county-base-data.json').then(r => r.json()),
     fetch('county-supp-data.json').then(r => r.json()).catch(() => ({})),
     fetch('county-yoe-data.json').then(r => r.json()).catch(() => ({})),
   ]);
   countyYoeData = yoeData;
-
-  const merged = {};
-  results.forEach(rows => {
-    const headers = rows[0];
-    const stateIdx = headers.indexOf('state');
-    const countyIdx = headers.indexOf('county');
-    const nameIdx = headers.indexOf('NAME');
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-      const fips = r[stateIdx] + r[countyIdx];
-      if (!merged[fips]) merged[fips] = { name: r[nameIdx] };
-      headers.forEach((h, j) => {
-        if (h === 'NAME' || h === 'state' || h === 'county') return;
-        const v = +r[j];
-        merged[fips][h] = isNaN(v) ? -1 : v;
-      });
-    }
-  });
 
   // Normalize + merge supp data (MOE, HK/Taiwan/Mainland, citizenship)
   const out = {};
@@ -2075,9 +2037,7 @@ function setupCountyLayer(topo, geojson) {
     const errEl = document.getElementById('loading-err');
     errEl.style.display = 'block';
     errEl.innerHTML = `<strong>Could not load data.</strong><br>${err.message}<br><br>
-      <small>Census API may be rate-limiting. Refresh, or get a free key at
-      <a href="https://api.census.gov/data/key_signup.html" style="color:#93c5fd" target="_blank">api.census.gov</a>
-      and paste it into CENSUS_KEY in the source.</small>`;
+      <small>Try refreshing the page.</small>`;
   }
 })();
 </script>
