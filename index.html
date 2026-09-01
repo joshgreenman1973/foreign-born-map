@@ -1078,14 +1078,14 @@ let countyYoeData = null;  // year-of-entry data for counties (loaded on demand)
 
 // ----- map setup -----
 const map = L.map('map', { center: [38.5, -97], zoom: 4, zoomSnap: 0.5, preferCanvas: true });
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=cb1_2r82_1_ae4e70b6166057bc41b89638', {
   attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>',
   subdomains: 'abcd', maxZoom: 19,
 }).addTo(map);
 const labelsPane = map.createPane('labels');
 labelsPane.style.zIndex = 650;
 labelsPane.style.pointerEvents = 'none';
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png?key=cb1_2r82_1_ae4e70b6166057bc41b89638', {
   subdomains: 'abcd', maxZoom: 19, pane: 'labels',
 }).addTo(map);
 
