@@ -42,8 +42,10 @@
       border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow-y: auto;
     }
+    /* Keep controls usable in short windows; let the sidebar scroll instead. */
+    #sidebar > :not(#sidebar-scroll) { flex-shrink: 0; }
     #sidebar-header {
       padding: 22px 22px 18px;
       border-bottom: 1px solid var(--line);
@@ -268,13 +270,14 @@
     .search-item:hover { background: var(--surface); color: #fff; }
 
     #sidebar-scroll {
-      flex: 1;
+      flex: 1 0 140px;
+      min-height: 140px;
       overflow-y: auto;
       padding: 0 22px 24px;
     }
-    #sidebar-scroll::-webkit-scrollbar { width: 6px; }
-    #sidebar-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
-    #sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    #sidebar::-webkit-scrollbar, #sidebar-scroll::-webkit-scrollbar { width: 6px; }
+    #sidebar::-webkit-scrollbar-thumb, #sidebar-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+    #sidebar::-webkit-scrollbar-track, #sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
 
     .tc-header {
       font-size: 10px;
@@ -700,21 +703,21 @@
   <div id="sidebar">
     <div id="sidebar-header">
       <div class="eyebrow">An interactive map</div>
-      <h1>Foreign-born <em>America</em>, <span id="header-scope">county by county</span></h1>
-      <p class="lede" id="lede-text">Where America's roughly 46 million immigrants live &mdash; and where the largest community from each of 96 countries of birth is concentrated.</p>
+      <h1>Foreign-born America, <span id="header-scope">county by county</span></h1>
+      <p class="lede" id="lede-text">Where America's roughly 47.3 million foreign-born residents live &mdash; explore 124 countries and places of birth.</p>
       <p class="source-line">ACS 5-year estimates (2020&ndash;<span id="data-year">2024</span>) &middot; U.S. Census Bureau &middot; <a id="methodology-link">Methodology &amp; caveats</a></p>
       <div class="caveat-strip">
-        <strong>Read with care.</strong> Country labels show <em>place of birth</em>, not ancestry &mdash; second-generation Americans aren't counted. The 5-year window averages 2020-2024, smoothing recent events (Ukraine, Venezuela, post-Title&nbsp;42). Estimates have margins of error; reliability is shown per county in the tooltip.
+        <strong>Read with care.</strong> Labels show <em>place of birth</em>, not ancestry &mdash; U.S.-born children of immigrants aren't counted. Estimates pool 2020&ndash;2024 data; they do not show today's population. Tooltips show margins of error and count reliability.
       </div>
     </div>
 
     <div id="geo-toggle">
       <button class="geo-btn active" data-geo="national">National<em>by county</em></button>
-      <button class="geo-btn" data-geo="city">City zoom<em>by census tract</em></button>
+      <button class="geo-btn" data-geo="city">City areas<em>by census tract</em></button>
     </div>
 
     <div id="city-select-wrap">
-      <div id="city-select-label">Pick a city</div>
+      <div id="city-select-label">Pick a city area</div>
       <select id="city-select"></select>
     </div>
 
@@ -757,8 +760,8 @@
         <span class="rel-dot rel-bad"></span>low
       </div>
       <div class="data-note">
-        Source: U.S. Census Bureau, ACS 5-year. Color scale uses quantile bins for visual contrast.
-        Small-county estimates may have wide margins of error.
+        Source: U.S. Census Bureau, 2020&ndash;2024 ACS 5-year.
+        <span id="scale-note">Fixed percentage bands.</span> Small-area estimates may have wide margins of error.
       </div>
     </div>
   </div>
@@ -773,23 +776,30 @@
     <div class="modal-sub">What this map does and doesn't show</div>
 
     <h3>Source</h3>
-    <p>U.S. Census Bureau, American Community Survey (ACS) 5-year estimates, 2020&ndash;2024. County-level data from <code>B05002</code>, <code>B05006</code>, <code>B05001</code>, plus margins of error. Census tract data for the 10 largest cities from the same tables. National place-of-birth tabulations are at <a href="https://api.census.gov/data/2024/acs/acs5/groups/B05006.html" target="_blank">api.census.gov</a>.</p>
+    <p>U.S. Census Bureau, American Community Survey (ACS) 5-year estimates, 2020&ndash;2024. County and tract estimates and margins of error come from <code>B05002</code> (population), <code>B05006</code> (place of birth), <code>B05001</code> (citizenship), and <code>B05005</code> (year of entry). See the <a href="https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/" target="_blank" rel="noopener">official data files</a>, <a href="https://api.census.gov/data/2024/acs/acs5/groups/B05006.html" target="_blank" rel="noopener">place-of-birth variable definitions</a>, and <a href="data-sources.json" target="_blank" rel="noopener">map data provenance</a>. The saved values were checked against the official files on October 2, 2026.</p>
+    <p>National benchmarks cover the 50 states and Washington, D.C.; Puerto Rico is excluded. The map's foreign-born total is 47,348,715 from B05006, which excludes people born at sea. B05002's broader foreign-born total is 47,349,078. Both round to 47.3 million. The menu includes 124 countries and places of birth; other and unspecified birthplace categories are included in the overall total but not offered separately.</p>
+
+    <h3>City-area coverage</h3>
+    <p>City areas shows census tracts across selected <strong>whole counties</strong>, not municipal boundaries. New York covers all five boroughs and Philadelphia covers Philadelphia County. The other choices show Los Angeles County, Cook County (Chicago), Harris County (Houston), Maricopa County (Phoenix), Bexar County (San Antonio), San Diego County, Dallas County, and Duval County (Jacksonville). These areas include other communities and may omit parts of a city extending into another county. All 124 birthplace categories are available in each view.</p>
 
     <h3>What "foreign-born" means here</h3>
     <p>Place-of-birth, not ancestry. A naturalized citizen who arrived from India in 1985 counts toward "India." Their U.S.-born children do not &mdash; ACS doesn't tabulate parental nativity at county or tract level, so <strong>second-generation Americans are not visible on this map</strong>. The everyday meaning of "Italian-American" or "Vietnamese-American" includes both generations; this map only shows the first.</p>
-    <p>Naturalized citizens, lawful permanent residents, students, work-visa holders, and undocumented residents are all combined under "foreign-born." The ACS systematically <strong>undercounts undocumented residents</strong> by an unknown but real amount, so figures for areas with large undocumented populations (parts of the border, large urban hubs) are biased downward.</p>
+    <p>The Census Bureau defines <a href="https://www.census.gov/topics/population/foreign-born/about/faq.html" target="_blank" rel="noopener">foreign-born</a> as people who were not U.S. citizens at birth. People born abroad to U.S. citizen parents are excluded. Naturalized citizens, lawful permanent residents, students, work-visa holders, and undocumented residents are combined; ACS does not identify undocumented status. Sampling margins of error do not capture all possible coverage or response errors.</p>
 
     <h3>The 5-year window</h3>
-    <p>ACS 5-year estimates are averages across 2020-2024. Major recent shifts &mdash; the post-COVID Asian-immigration drop, the Venezuelan and Haitian asylum surge, the Ukrainian war influx, and the 2023 Title 42 expiration &mdash; are all <strong>smoothed</strong> rather than visible. To see post-2022 changes specifically, you'd need single-year ACS estimates (which require 65,000+ population) or the 2023 5-year as a comparison baseline.</p>
+    <p>ACS 5-year estimates pool responses collected throughout 2020&ndash;2024. They represent that period, not a snapshot of 2024 or today's population. For annual changes, use a consistent series of ACS 1-year estimates where available (generally areas with at least 65,000 residents). For 5-year comparisons, Census recommends <a href="https://www.census.gov/programs-surveys/acs/guidance/comparing-acs-data/2024.html" target="_blank" rel="noopener">nonoverlapping periods</a>, such as 2015&ndash;2019 versus 2020&ndash;2024. Comparing the 2023 and 2024 5-year releases does not isolate recent change.</p>
 
     <h3>Margins of error &amp; reliability</h3>
     <p>Every ACS estimate carries a margin of error (MOE). For small countries in small counties, the MOE can exceed the estimate itself. The tooltip shows a colored dot indicating reliability based on the coefficient of variation:</p>
     <ul>
-      <li><span class="rel-dot rel-good"></span> <strong>High</strong>: CV &lt; 15% &mdash; estimate is reliable</li>
+      <li><span class="rel-dot rel-good"></span> <strong>High</strong>: CV &lt; 15% &mdash; lower relative sampling error</li>
       <li><span class="rel-dot rel-warn"></span> <strong>Moderate</strong>: CV 15&ndash;30% &mdash; use with caution</li>
       <li><span class="rel-dot rel-bad"></span> <strong>Low</strong>: CV &ge; 30% &mdash; estimate may be unreliable</li>
     </ul>
-    <p>Tract-level estimates are <strong>much less reliable</strong> than county-level, especially for less common origins. We surface the same indicator at tract level; expect the dot to be red far more often.</p>
+    <p>These are the map's screening thresholds, not guarantees of accuracy. CV = (MOE / 1.645) / estimate, using the <a href="https://www.census.gov/programs-surveys/acs/methodology/sample-size-and-data-quality/quality-standards-metrics-definitions.html" target="_blank" rel="noopener">Census formula</a> for 90% margins of error. Indicators describe the resident <strong>count</strong>, not the uncertainty of a percentage or LQ. Zero estimates are shown as zero, not missing data; their CV is undefined. Tract estimates can have large relative errors, especially for less common birthplaces.</p>
+
+    <h3>Rankings</h3>
+    <p>Percentage rankings require more than 5,000 county residents or 800 tract residents; count and LQ rankings require more than 50 residents. All lists exclude zero and missing estimates. Bottom lists include only counts with high or moderate reliability (CV below 30%). Rankings order point estimates, not statistically significant differences. Tooltip birthplace rankings cover the 124 listed categories.</p>
 
     <h3>Location quotient (LQ)</h3>
     <p>LQ measures <strong>concentration relative to the national average</strong>. An LQ of 1 means a county has the same share of foreign-born from country X as the U.S. as a whole. LQ = 5 means 5&times; more concentrated. LQ &lt; 1 means under-represented. LQ is the standard demographic measure for spotting ethnic enclaves and avoids the "everywhere is just LA and NYC" problem of raw counts. The 1.0 line is marked on the legend.</p>
@@ -797,32 +807,32 @@
     <h3>Country definitions you should know</h3>
     <ul>
       <li><strong>China</strong> is split into three: mainland China (excl. Hong Kong &amp; Taiwan), Hong Kong, and Taiwan. ACS treats them separately; we now do too.</li>
-      <li><strong>Korea</strong> is not split N/S in ACS. In practice nearly all foreign-born residents from "Korea" are from South Korea.</li>
+      <li><strong>Korea</strong> is a combined category; this ACS table does not separate North and South Korea.</li>
       <li><strong>United Kingdom</strong> aggregates England, Scotland, Wales, and Northern Ireland (with Crown Dependencies); ACS publishes sub-totals but most users want the aggregate.</li>
-      <li><strong>Czechoslovakia</strong> hasn't existed since 1993, but ACS still publishes it as a single category for older immigrants who reported it.</li>
+      <li><strong>Czechoslovakia</strong> is the ACS category that includes the Czech Republic and Slovakia; it is not limited to people who reported the former country.</li>
     </ul>
 
     <h3>Choropleth distortion</h3>
-    <p>Large rural counties visually shout louder than small urban ones. A 10,000-square-mile Nevada county with 4,000 immigrants looks bigger than Manhattan with 600,000. Keep scale in mind, especially in the Mountain West.</p>
+    <p>Large rural counties occupy more map area than small urban ones, even when they have far fewer residents. Land area is not population. The optional proportional dots show counts through circle area.</p>
 
     <h3>Ecological fallacy warning</h3>
-    <p>A county at 25% foreign-born does not mean every neighborhood inside it is 25%. Use the "City zoom" mode to see tract-level variation inside the 10 largest cities. For other counties, internal variation can be substantial.</p>
+    <p>A county at 25% foreign-born does not mean every neighborhood inside it is 25%. Use "City areas" to see tract-level variation in the covered counties. A census tract is a statistical area, not necessarily a named neighborhood.</p>
 
     <h3>What's <em>not</em> here (yet)</h3>
     <ul>
-      <li>Tract-level data for cities outside the top 10.</li>
+      <li>Tract-level data outside the ten selected city areas.</li>
       <li>Trend over time (would require comparing multiple ACS year vintages).</li>
-      <li>Second-generation Americans (would require PUMS-level analysis &mdash; ACS doesn't tabulate parental nativity at county or tract geography).</li>
+      <li>Second-generation Americans. Measuring parental birthplace requires a suitable source and method; the ACS tables used here do not provide it.</li>
     </ul>
 
     <h3>What's been added (recent)</h3>
     <ul>
-      <li><strong>Year of arrival</strong> shown in the tooltip when hovering a county (four buckets: 2010+, 2000s, 1990s, pre-1990) or a city tract (binary recent / established split).</li>
+      <li><strong>Year of entry to the U.S.</strong> shown in the tooltip for a county (2010+, 2000s, 1990s, pre-1990) or a tract (2010+ / before 2010). This is not the year of arrival in that county or city. Percentages are rounded independently and may not sum to 100%.</li>
       <li><strong>Proportional symbols overlay</strong> (toggle "Overlay proportional dots") &mdash; circle area scales with raw count, correcting the choropleth's area distortion that makes large rural counties shout louder than small dense ones.</li>
     </ul>
 
     <h3>Related reading</h3>
-    <p>For a deep dive on New York City specifically &mdash; countries of origin, settlement patterns, socioeconomic profiles and the legal paths of entry &mdash; see the NYC Department of City Planning's <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/" target="_blank" rel="noopener"><em>The Newest New Yorkers 2026</em></a>, its first full update since 2013 (based on the 2023 ACS). It counts about 3.09 million foreign-born New Yorkers, with China now the single largest group of origin, just ahead of the Dominican Republic.</p>
+    <p>For a deep dive on New York City &mdash; countries of origin, settlement patterns, socioeconomic profiles and legal paths of entry &mdash; see the NYC Department of City Planning's <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/" target="_blank" rel="noopener"><em>The Newest New Yorkers 2026</em></a>, its first full update since 2013. Its 2023 ACS figures count about 3.09 million foreign-born New Yorkers. <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/Ch2.html#tbl-FBPopRank" target="_blank" rel="noopener">China and the Dominican Republic share first rank</a> after accounting for statistical uncertainty. That report combines mainland China, Hong Kong and Taiwan; this map lists them separately and uses the 2020&ndash;2024 ACS 5-year period.</p>
 
     <h3>Code</h3>
     <p>Open source: <a href="https://github.com/joshgreenman1973/foreign-born-map" target="_blank">github.com/joshgreenman1973/foreign-born-map</a></p>
@@ -843,7 +853,7 @@
     <span class="tt-stat-label">Foreign-born residents</span>
     <span class="tt-stat-val" id="tt-foreign"></span>
   </div>
-  <div class="tt-sub" id="tt-foreign-share" style="display:none"></div>
+  <div class="tt-rel-line" id="tt-foreign-share" style="display:none"></div>
 
   <div class="tt-citizenship" id="tt-citizenship" style="display:none"></div>
 
@@ -858,7 +868,7 @@
 
   <div class="tt-section" id="tt-top-block">
     <div class="tt-top-label">
-      Top origin countries
+      Top listed birthplaces
       <span class="tt-top-sub">share = % of foreign-born</span>
     </div>
     <div id="tt-top-list"></div>
@@ -1016,9 +1026,9 @@ REGIONS.forEach(([region, list]) => list.forEach(([v, name]) => {
 
 // Country footnotes — surface known data quirks when these are picked
 const COUNTRY_NOTES = {
-  'B05006_054E': 'ACS does not split North/South Korea. In practice nearly all "Korea" foreign-born are from South Korea.',
+  'B05006_054E': 'This ACS table reports Korea as a combined category, without separating North and South Korea.',
   'B05006_008E': 'Aggregates England, Scotland, Wales, Northern Ireland, and Crown Dependencies.',
-  'B05006_034E': 'Czechoslovakia hasn\'t existed since 1993, but ACS still publishes the legacy category.',
+  'B05006_034E': 'The ACS category includes the Czech Republic and Slovakia, not only people reporting the former country.',
   'B05006_050E': 'Mainland China only (excludes Hong Kong and Taiwan, which appear separately).',
   'B05006_051E': 'Hong Kong is reported separately from mainland China in ACS.',
   'B05006_052E': 'Taiwan is reported separately from mainland China in ACS.',
@@ -1043,18 +1053,18 @@ const SEARCH_ALIASES = {
 // National-share lookup, computed once data is loaded — used for LQ
 const NATIONAL_SHARE = {};
 
-// Cities config: id, display name, county FIPS that make up the city's coverage area
+// City-area config: familiar city name, actual coverage label, and whole county FIPS
 const CITIES = [
-  { id: 'nyc',          name: 'New York',     counties: ['36005','36047','36061','36081','36085'] },
-  { id: 'la',           name: 'Los Angeles',  counties: ['06037'] },
-  { id: 'chicago',      name: 'Chicago',      counties: ['17031'] },
-  { id: 'houston',      name: 'Houston',      counties: ['48201'] },
-  { id: 'phoenix',      name: 'Phoenix',      counties: ['04013'] },
-  { id: 'philadelphia', name: 'Philadelphia', counties: ['42101'] },
-  { id: 'sanantonio',   name: 'San Antonio',  counties: ['48029'] },
-  { id: 'sandiego',     name: 'San Diego',    counties: ['06073'] },
-  { id: 'dallas',       name: 'Dallas',       counties: ['48113'] },
-  { id: 'jacksonville', name: 'Jacksonville', counties: ['12031'] },
+  { id: 'nyc',          name: 'New York', coverage: 'New York City',     counties: ['36005','36047','36061','36081','36085'] },
+  { id: 'la',           name: 'Los Angeles', coverage: 'Los Angeles County',  counties: ['06037'] },
+  { id: 'chicago',      name: 'Chicago', coverage: 'Cook County',      counties: ['17031'] },
+  { id: 'houston',      name: 'Houston', coverage: 'Harris County',      counties: ['48201'] },
+  { id: 'phoenix',      name: 'Phoenix', coverage: 'Maricopa County',      counties: ['04013'] },
+  { id: 'philadelphia', name: 'Philadelphia', coverage: 'Philadelphia', counties: ['42101'] },
+  { id: 'sanantonio',   name: 'San Antonio', coverage: 'Bexar County',  counties: ['48029'] },
+  { id: 'sandiego',     name: 'San Diego', coverage: 'San Diego County',    counties: ['06073'] },
+  { id: 'dallas',       name: 'Dallas', coverage: 'Dallas County',       counties: ['48113'] },
+  { id: 'jacksonville', name: 'Jacksonville', coverage: 'Duval County', counties: ['12031'] },
 ];
 
 // State
@@ -1152,6 +1162,8 @@ function buildColorScale() {
 }
 
 function updateLegend() {
+  document.getElementById('scale-note').textContent = currentVar === 'ALL' && viewMode === 'pop'
+    ? 'Fixed percentage bands.' : 'Quantile color bands for this view.';
   document.getElementById('legend-bar').style.background =
     `linear-gradient(to right, ${COLOR_STOPS.join(',')})`;
   const ticks = document.getElementById('legend-ticks');
@@ -1180,8 +1192,7 @@ function updateLegend() {
     benchLabel = `U.S. avg ${benchVal.toFixed(1)}%`;
   } else if (viewMode === 'pop') {
     // National pct of pop from country X = totals[var] / total US pop
-    let totalUSPop = 0;
-    for (const f in countyDataAll) totalUSPop += countyDataAll[f].pop || 0;
+    const totalUSPop = NATIONAL_SHARE._totalPop;
     const natShareOfPop = NATIONAL_SHARE[currentVar] && NATIONAL_SHARE._totalFB && totalUSPop
       ? (NATIONAL_SHARE[currentVar] * NATIONAL_SHARE._totalFB) / totalUSPop * 100 : 0;
     benchVal = natShareOfPop;
@@ -1222,9 +1233,12 @@ function updateLegend() {
 function computeNationalShares() {
   // Sum from countyDataAll. LQ = (local share of FB from X) / (national share of FB from X)
   let totalFB = 0;
+  let totalPop = 0;
   const totals = {};
   for (const fips in countyDataAll) {
+    if (fips.startsWith('72')) continue; // U.S. benchmarks exclude Puerto Rico.
     const d = countyDataAll[fips];
+    if (d.pop > 0) totalPop += d.pop;
     if (d.foreign > 0) totalFB += d.foreign;
     COUNTRY_VARS.forEach(v => {
       const n = d[v];
@@ -1235,11 +1249,13 @@ function computeNationalShares() {
     NATIONAL_SHARE[v] = totalFB > 0 ? (totals[v] || 0) / totalFB : 0;
   });
   NATIONAL_SHARE._totalFB = totalFB;
-  NATIONAL_SHARE._allShareOfPop = (() => {
-    let pop = 0;
-    for (const fips in countyDataAll) pop += countyDataAll[fips].pop || 0;
-    return pop > 0 ? totalFB / pop * 100 : 0;
-  })();
+  NATIONAL_SHARE._totalPop = totalPop;
+  NATIONAL_SHARE._allShareOfPop = totalPop > 0 ? totalFB / totalPop * 100 : 0;
+}
+
+function nationalLede() {
+  const millions = (NATIONAL_SHARE._totalFB / 1e6).toFixed(1);
+  return `Where America's roughly ${millions} million foreign-born residents live — explore ${COUNTRY_VARS.length} countries and places of birth.`;
 }
 
 // ----- compute -----
@@ -1281,7 +1297,7 @@ function reliabilityClass(estimate, moe) {
   return 'bad';
 }
 function reliabilityText(cls) {
-  return { good: 'reliable', warn: 'use with caution', bad: 'low reliability', na: 'no data' }[cls] || '';
+  return { good: 'reliable', warn: 'use with caution', bad: 'low reliability', na: 'zero estimate (CV undefined)' }[cls] || '';
 }
 
 // ----- map render -----
@@ -1375,7 +1391,7 @@ function hookCircleToggle() {
 function updateLegendLabel() {
   const el = document.getElementById('legend-label');
   if (currentVar === 'ALL') {
-    el.textContent = 'Map color: % of county population that is foreign-born';
+    el.textContent = `Map color: % of ${geoLevel === 'city' ? 'tract' : 'county'} population that is foreign-born`;
   } else if (viewMode === 'lq') {
     el.textContent = `Map color: location quotient (LQ) for ${currentLabel} — concentration vs. U.S. average`;
   } else if (viewMode === 'fb') {
@@ -1419,7 +1435,7 @@ function buildTopCountiesList() {
   const primaryKey = isLQ ? 'lq' : (sortByPct ? 'pct' : 'n');
   const sortLabel = isLQ ? 'by location quotient' : (sortByPct ? 'by % of population' : 'by total count');
   const isCity = (geoLevel === 'city');
-  const cityName = isCity ? (CITIES.find(c => c.id === currentCity)?.name || '') : '';
+  const cityName = isCity ? (CITIES.find(c => c.id === currentCity)?.coverage || '') : '';
   const unitLabel = isCity ? 'tracts' : 'counties';
   const topN = isCity ? 25 : 50;
   const botN = isCity ? 15 : 50;
@@ -1434,7 +1450,7 @@ function buildTopCountiesList() {
     const cityTag = isCity ? ` in <em>${cityName}</em>` : '';
     html += `<div class="tc-header">Top ${topN} ${unitLabel}${cityTag} &mdash; <em>most foreign-born</em> &middot; ${sortLabel}</div>`;
     html += renderRows(top, 1, topMax);
-    html += `<div class="tc-header">Bottom ${bot.length} ${unitLabel}${cityTag} &mdash; <em>fewest (reliable estimates only)</em></div>`;
+    html += `<div class="tc-header">Bottom ${bot.length} ${unitLabel}${cityTag} &mdash; <em>fewest (high/moderate reliability)</em></div>`;
     html += renderRows(bot, 1, botMax, { bottom: true });
   } else {
     const top = entries.slice(0, topN);
@@ -1510,6 +1526,12 @@ function showTooltip(e, feature) {
   document.getElementById('tt-pop').textContent = d.pop ? d.pop.toLocaleString() : 'N/A';
   document.getElementById('tt-foreign').textContent = d.foreign >= 0 ? d.foreign.toLocaleString() : 'N/A';
 
+  const totalRelEl = document.getElementById('tt-foreign-share');
+  const totalRel = reliabilityClass(d.foreign, d.foreign_m);
+  totalRelEl.style.display = totalRel ? 'block' : 'none';
+  totalRelEl.innerHTML = totalRel
+    ? `<span class="rel-dot rel-${totalRel}"></span>Count: ${reliabilityText(totalRel)}${d.foreign_m >= 0 ? ` ±${d.foreign_m.toLocaleString()}` : ''}` : '';
+
   const headlineEl = document.getElementById('tt-headline-pct');
   if (d.pop > 0 && d.foreign >= 0) {
     const pctAll = ((d.foreign / d.pop) * 100).toFixed(1);
@@ -1541,7 +1563,7 @@ function showTooltip(e, feature) {
       const total = (d.yoe_2010plus || 0) + (d.yoe_2000s || 0) + (d.yoe_1990s || 0) + (d.yoe_pre1990 || 0);
       if (total > 0) {
         const p = n => Math.round((n / total) * 100);
-        yoeLine = `<div class="tt-yoe-label">Year of arrival (foreign-born)</div>` +
+        yoeLine = `<div class="tt-yoe-label">U.S. entry year (foreign-born)</div>` +
           `<div class="tt-yoe-row">` +
             `<span><strong>2010+</strong> ${p(d.yoe_2010plus || 0)}%</span>` +
             `<span><strong>2000s</strong> ${p(d.yoe_2000s || 0)}%</span>` +
@@ -1549,11 +1571,14 @@ function showTooltip(e, feature) {
             `<span><strong>pre-1990</strong> ${p(d.yoe_pre1990 || 0)}%</span>` +
           `</div>`;
       }
-    } else if (d.yoe_2010plus !== undefined && d.yoe_2010plus > 0 && d.foreign > 0) {
+    } else if (d.yoe_2010plus !== undefined && d.yoe_2010plus >= 0 && d.foreign > 0) {
       // Tract-level: only 2010+ available, infer established
-      const recPct = Math.round((d.yoe_2010plus / d.foreign) * 100);
+      // B05005 includes people born at sea; use the matching citizenship total.
+      const entryTotal = d.naturalized >= 0 && d.noncitizen >= 0
+        ? d.naturalized + d.noncitizen : d.foreign;
+      const recPct = Math.round((d.yoe_2010plus / entryTotal) * 100);
       const estPct = 100 - recPct;
-      yoeLine = `<div class="tt-yoe-label">Year of arrival (foreign-born)</div>` +
+      yoeLine = `<div class="tt-yoe-label">U.S. entry year (foreign-born)</div>` +
         `<div class="tt-yoe-row">` +
           `<span><strong>2010+</strong> ${recPct}%</span>` +
           `<span><strong>before 2010</strong> ${estPct}%</span>` +
@@ -1648,6 +1673,7 @@ async function loadCensusData() {
   // Normalize + merge supp data (MOE, HK/Taiwan/Mainland, citizenship)
   const out = {};
   for (const fips in merged) {
+    if (fips.startsWith('72')) continue; // Puerto Rico has separate ACS tables.
     const m = merged[fips];
     const supp = suppData[fips] || {};
     const yoe = (yoeData && yoeData[fips]) || {};
@@ -1802,7 +1828,7 @@ document.addEventListener('click', e => {
 // ----- city mode -----
 function buildCitySelect() {
   const sel = document.getElementById('city-select');
-  sel.innerHTML = CITIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  sel.innerHTML = CITIES.map(c => `<option value="${c.id}">${c.name === c.coverage ? c.name : `${c.name} — ${c.coverage}`}</option>`).join('');
   sel.addEventListener('change', () => switchToCity(sel.value));
 }
 
@@ -1855,18 +1881,21 @@ function switchToCity(cityId) {
     geoLevel = 'city';
     document.querySelectorAll('.geo-btn').forEach(b => b.classList.toggle('active', b.dataset.geo === 'city'));
     document.getElementById('city-select-wrap').classList.add('shown');
-    document.getElementById('header-scope').textContent = 'neighborhood by neighborhood';
-    document.getElementById('lede-text').textContent =
-      'Census tracts inside America\'s ten largest cities — about neighborhood-sized — ranked and colored by foreign-born share.';
+    document.getElementById('header-scope').textContent = 'tract by tract';
   }
   document.getElementById('city-select').value = cityId;
+  document.getElementById('lede-text').textContent =
+    `Census tracts across ${city.coverage}. Coverage follows whole county boundaries, not city limits; explore all ${COUNTRY_VARS.length} listed birthplaces.`;
   enterCityMode(city);
 }
 
 async function enterCityMode(city) {
   await loadTractDataIfNeeded();
 
-  // Filter tract dataset to this city's counties
+  // A newer selection may have arrived while the tract files were loading.
+  if (geoLevel !== 'city' || currentCity !== city.id) return;
+
+  // Filter tract dataset to this area's counties
   const prefixes = city.counties; // 5-char strings like "36005"
   const filtered = {};
   for (const geoid in tractDataAll) {
@@ -1917,6 +1946,7 @@ async function enterCityMode(city) {
   }).addTo(map);
 
   map.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
+  updateLegendLabel();
   updateMap();
   buildTopCountiesList();
 }
@@ -1927,8 +1957,7 @@ function exitCityMode() {
   document.querySelectorAll('.geo-btn').forEach(b => b.classList.toggle('active', b.dataset.geo === 'national'));
   document.getElementById('city-select-wrap').classList.remove('shown');
   document.getElementById('header-scope').textContent = 'county by county';
-  document.getElementById('lede-text').textContent =
-    'Where America\'s roughly 46 million immigrants live — and where the largest community from each of 94 countries of origin is concentrated.';
+  document.getElementById('lede-text').textContent = nationalLede();
 
   if (geoLayer) map.removeLayer(geoLayer);
   if (stateMeshLayer) map.removeLayer(stateMeshLayer);
@@ -1937,6 +1966,7 @@ function exitCityMode() {
   activeData = countyDataAll;
   setupCountyLayer(countyTopoCached, countyGeojsonCached);
   map.setView(countyHomeView.center, countyHomeView.zoom);
+  updateLegendLabel();
   updateMap();
   buildTopCountiesList();
 }
@@ -2024,6 +2054,7 @@ function setupCountyLayer(topo, geojson) {
     countyDataAll = data;
     activeData = data;
     computeNationalShares();
+    document.getElementById('lede-text').textContent = nationalLede();
     countyTopoCached = topo;
     const topoKey = Object.keys(topo.objects)[0];
     countyGeojsonCached = topojson.feature(topo, topo.objects[topoKey]);

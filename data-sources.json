@@ -1,0 +1,41 @@
+{
+  "title": "Foreign-born America \u2014 data provenance",
+  "acs_period": "2020\u20132024",
+  "verified_on": "2026-10-02",
+  "national_coverage": "50 states and District of Columbia; Puerto Rico excluded",
+  "tables": {
+    "B05001": "Citizenship status",
+    "B05002": "Nativity and place of birth; total population",
+    "B05005": "Nativity by year of entry",
+    "B05006": "Place of birth for the foreign-born population, excluding people born at sea"
+  },
+  "official_bulk_directory": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/",
+  "official_files": {
+    "B05001": {
+      "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b05001.dat",
+      "sha256": "751af61a36295decb4336b6a09d9fdf31f24e51b7dba7967ad832cd66d18da60"
+    },
+    "B05002": {
+      "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b05002.dat",
+      "sha256": "7c97161f6a299ba213b54acad4fc869bd993f438ca70287a61d5b857d98ba295"
+    },
+    "B05005": {
+      "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b05005.dat",
+      "sha256": "cfccafa4cab0ae953b5d21f0b6ffda4dd278e418800d7e911181ec469db95a4d"
+    },
+    "B05006": {
+      "url": "https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/acsdt5y2024-b05006.dat",
+      "sha256": "fe794fb4011a07debc441ac919eaa10cba2a33443f456264593e892131a11eed"
+    }
+  },
+  "birthplace_categories": 124,
+  "tract_coverage": "Whole counties listed in the city-area menu, not municipal boundaries",
+  "rebuild_missing_fields": "python3 bake_missing_birthplace_data.py /path/to/acsdt5y2024-b05006.dat",
+  "local_data_sha256": {
+    "county-base-data.json": "c38ef4969764d48e42fc1229a172435962170ec055d01a6df84d5a4274649deb",
+    "county-supp-data.json": "48ddc7c8af94d5c8f812bfb329073d295920e341e1301dd16ef6cca06e0049b5",
+    "county-yoe-data.json": "df1f86f0f02820c103eb5dc0a78915072eaeb7d206a0c45b70a96c6a9db93c7b",
+    "city-tracts-data.json": "f2dedcf4d76d59daa179e008d5bbb697a9d2198d3e1d4e1819d97bf18860d20a",
+    "tract-supp-data.json": "66a511aa4e18a3b2c83146decdd8b2c93f4da851c368236e55e68fa63788ff6b"
+  }
+}
