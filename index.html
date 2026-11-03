@@ -704,7 +704,7 @@
     <div id="sidebar-header">
       <div class="eyebrow">An interactive map</div>
       <h1>Foreign-born America, <span id="header-scope">county by county</span></h1>
-      <p class="lede" id="lede-text">Where America's roughly 47.3 million foreign-born residents live &mdash; explore 124 countries and places of birth.</p>
+      <p class="lede" id="lede-text">Where America's roughly 47.3 million foreign-born residents live, by 124 countries and places of birth.</p>
       <p class="source-line">ACS 5-year estimates (2020&ndash;<span id="data-year">2024</span>) &middot; U.S. Census Bureau &middot; <a id="methodology-link">Methodology &amp; caveats</a></p>
       <div class="caveat-strip">
         <strong>Read with care.</strong> Labels show <em>place of birth</em>, not ancestry &mdash; U.S.-born children of immigrants aren't counted. Estimates pool 2020&ndash;2024 data; they do not show today's population. Tooltips show margins of error and count reliability.
@@ -776,21 +776,21 @@
     <div class="modal-sub">What this map does and doesn't show</div>
 
     <h3>Source</h3>
-    <p>U.S. Census Bureau, American Community Survey (ACS) 5-year estimates, 2020&ndash;2024. County and tract estimates and margins of error come from <code>B05002</code> (population), <code>B05006</code> (place of birth), <code>B05001</code> (citizenship), and <code>B05005</code> (year of entry). See the <a href="https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/" target="_blank" rel="noopener">official data files</a>, <a href="https://api.census.gov/data/2024/acs/acs5/groups/B05006.html" target="_blank" rel="noopener">place-of-birth variable definitions</a>, and <a href="data-sources.json" target="_blank" rel="noopener">map data provenance</a>. The saved values were checked against the official files on October 2, 2026.</p>
+    <p>U.S. Census Bureau, American Community Survey (ACS) 5-year estimates, 2020&ndash;2024. County and tract estimates and margins of error come from <code>B05002</code> (population), <code>B05006</code> (place of birth), <code>B05001</code> (citizenship) and <code>B05005</code> (year of entry). See the <a href="https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF/data/5YRData/" target="_blank" rel="noopener">official data files</a>, <a href="https://api.census.gov/data/2024/acs/acs5/groups/B05006.html" target="_blank" rel="noopener">place-of-birth variable definitions</a> and <a href="data-sources.json" target="_blank" rel="noopener">map data provenance</a>. The saved values were checked against the official files on October 2, 2026.</p>
     <p>National benchmarks cover the 50 states and Washington, D.C.; Puerto Rico is excluded. The map's foreign-born total is 47,348,715 from B05006, which excludes people born at sea. B05002's broader foreign-born total is 47,349,078. Both round to 47.3 million. The menu includes 124 countries and places of birth; other and unspecified birthplace categories are included in the overall total but not offered separately.</p>
 
     <h3>City-area coverage</h3>
-    <p>City areas shows census tracts across selected <strong>whole counties</strong>, not municipal boundaries. New York covers all five boroughs and Philadelphia covers Philadelphia County. The other choices show Los Angeles County, Cook County (Chicago), Harris County (Houston), Maricopa County (Phoenix), Bexar County (San Antonio), San Diego County, Dallas County, and Duval County (Jacksonville). These areas include other communities and may omit parts of a city extending into another county. All 124 birthplace categories are available in each view.</p>
+    <p>City areas shows census tracts across selected <strong>whole counties</strong>, not municipal boundaries. New York covers all five boroughs and Philadelphia covers Philadelphia County. The other choices show Los Angeles County, Cook County (Chicago), Harris County (Houston), Maricopa County (Phoenix), Bexar County (San Antonio), San Diego County, Dallas County and Duval County (Jacksonville). These areas include other communities and may omit parts of a city extending into another county. All 124 birthplace categories are available in each view.</p>
 
     <h3>What "foreign-born" means here</h3>
     <p>Place-of-birth, not ancestry. A naturalized citizen who arrived from India in 1985 counts toward "India." Their U.S.-born children do not &mdash; ACS doesn't tabulate parental nativity at county or tract level, so <strong>second-generation Americans are not visible on this map</strong>. The everyday meaning of "Italian-American" or "Vietnamese-American" includes both generations; this map only shows the first.</p>
-    <p>The Census Bureau defines <a href="https://www.census.gov/topics/population/foreign-born/about/faq.html" target="_blank" rel="noopener">foreign-born</a> as people who were not U.S. citizens at birth. People born abroad to U.S. citizen parents are excluded. Naturalized citizens, lawful permanent residents, students, work-visa holders, and undocumented residents are combined; ACS does not identify undocumented status. Sampling margins of error do not capture all possible coverage or response errors.</p>
+    <p>The Census Bureau defines <a href="https://www.census.gov/topics/population/foreign-born/about/faq.html" target="_blank" rel="noopener">foreign-born</a> as people who were not U.S. citizens at birth. People born abroad to U.S. citizen parents are excluded. Naturalized citizens, lawful permanent residents, students, work-visa holders and undocumented residents are combined; ACS does not identify undocumented status. Sampling margins of error do not capture all possible coverage or response errors.</p>
 
     <h3>The 5-year window</h3>
     <p>ACS 5-year estimates pool responses collected throughout 2020&ndash;2024. They represent that period, not a snapshot of 2024 or today's population. For annual changes, use a consistent series of ACS 1-year estimates where available (generally areas with at least 65,000 residents). For 5-year comparisons, Census recommends <a href="https://www.census.gov/programs-surveys/acs/guidance/comparing-acs-data/2024.html" target="_blank" rel="noopener">nonoverlapping periods</a>, such as 2015&ndash;2019 versus 2020&ndash;2024. Comparing the 2023 and 2024 5-year releases does not isolate recent change.</p>
 
     <h3>Margins of error &amp; reliability</h3>
-    <p>Every ACS estimate carries a margin of error (MOE). For small countries in small counties, the MOE can exceed the estimate itself. The tooltip shows a colored dot indicating reliability based on the coefficient of variation:</p>
+    <p>Every ACS estimate carries a margin of error (MOE). For small countries in small counties, the MOE can exceed the estimate itself. The tooltip shows a colored dot indicating reliability based on the coefficient of variation (CV):</p>
     <ul>
       <li><span class="rel-dot rel-good"></span> <strong>High</strong>: CV &lt; 15% &mdash; lower relative sampling error</li>
       <li><span class="rel-dot rel-warn"></span> <strong>Moderate</strong>: CV 15&ndash;30% &mdash; use with caution</li>
@@ -806,14 +806,14 @@
 
     <h3>Country definitions you should know</h3>
     <ul>
-      <li><strong>China</strong> is split into three: mainland China (excl. Hong Kong &amp; Taiwan), Hong Kong, and Taiwan. ACS treats them separately; we now do too.</li>
+      <li><strong>China</strong> is split into three: mainland China (excl. Hong Kong &amp; Taiwan), Hong Kong and Taiwan. ACS treats them separately; we now do too.</li>
       <li><strong>Korea</strong> is a combined category; this ACS table does not separate North and South Korea.</li>
-      <li><strong>United Kingdom</strong> aggregates England, Scotland, Wales, and Northern Ireland (with Crown Dependencies); ACS publishes sub-totals but most users want the aggregate.</li>
+      <li><strong>United Kingdom</strong> aggregates England, Scotland, Wales and Northern Ireland (with Crown Dependencies); ACS publishes sub-totals but most users want the aggregate.</li>
       <li><strong>Czechoslovakia</strong> is the ACS category that includes the Czech Republic and Slovakia; it is not limited to people who reported the former country.</li>
     </ul>
 
     <h3>Choropleth distortion</h3>
-    <p>Large rural counties occupy more map area than small urban ones, even when they have far fewer residents. Land area is not population. The optional proportional dots show counts through circle area.</p>
+    <p>Large rural counties occupy more map area than small urban ones, even when they have far fewer residents. The optional proportional dots show counts through circle area.</p>
 
     <h3>Ecological fallacy warning</h3>
     <p>A county at 25% foreign-born does not mean every neighborhood inside it is 25%. Use "City areas" to see tract-level variation in the covered counties. A census tract is a statistical area, not necessarily a named neighborhood.</p>
@@ -828,11 +828,11 @@
     <h3>What's been added (recent)</h3>
     <ul>
       <li><strong>Year of entry to the U.S.</strong> shown in the tooltip for a county (2010+, 2000s, 1990s, pre-1990) or a tract (2010+ / before 2010). This is not the year of arrival in that county or city. Percentages are rounded independently and may not sum to 100%.</li>
-      <li><strong>Proportional symbols overlay</strong> (toggle "Overlay proportional dots") &mdash; circle area scales with raw count, correcting the choropleth's area distortion that makes large rural counties shout louder than small dense ones.</li>
+      <li><strong>Proportional symbols overlay</strong> (toggle "Overlay proportional dots") &mdash; circle area scales with raw count, correcting the choropleth's area distortion that makes large rural counties look more prominent than small dense ones.</li>
     </ul>
 
     <h3>Related reading</h3>
-    <p>For a deep dive on New York City &mdash; countries of origin, settlement patterns, socioeconomic profiles and legal paths of entry &mdash; see the NYC Department of City Planning's <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/" target="_blank" rel="noopener"><em>The Newest New Yorkers 2026</em></a>, its first full update since 2013. Its 2023 ACS figures count about 3.09 million foreign-born New Yorkers. <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/Ch2.html#tbl-FBPopRank" target="_blank" rel="noopener">China and the Dominican Republic share first rank</a> after accounting for statistical uncertainty. That report combines mainland China, Hong Kong and Taiwan; this map lists them separately and uses the 2020&ndash;2024 ACS 5-year period.</p>
+    <p>For more on New York City &mdash; countries of origin, settlement patterns, socioeconomic profiles and legal paths of entry &mdash; see the NYC Department of City Planning's <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/" target="_blank" rel="noopener"><em>The Newest New Yorkers 2026</em></a>, its first full update since 2013. Its 2023 ACS figures count about 3.09 million foreign-born New Yorkers. <a href="https://www.nyc.gov/assets/planning/newest-new-yorkers-2026/Ch2.html#tbl-FBPopRank" target="_blank" rel="noopener">China and the Dominican Republic share first rank</a> after accounting for statistical uncertainty. That report combines mainland China, Hong Kong and Taiwan; this map lists them separately and uses the 2020&ndash;2024 ACS 5-year period.</p>
 
     <h3>Code</h3>
     <p>Open source: <a href="https://github.com/joshgreenman1973/foreign-born-map" target="_blank">github.com/joshgreenman1973/foreign-born-map</a></p>
@@ -1255,7 +1255,7 @@ function computeNationalShares() {
 
 function nationalLede() {
   const millions = (NATIONAL_SHARE._totalFB / 1e6).toFixed(1);
-  return `Where America's roughly ${millions} million foreign-born residents live — explore ${COUNTRY_VARS.length} countries and places of birth.`;
+  return `Where America's roughly ${millions} million foreign-born residents live, by ${COUNTRY_VARS.length} countries and places of birth.`;
 }
 
 // ----- compute -----
@@ -1885,7 +1885,7 @@ function switchToCity(cityId) {
   }
   document.getElementById('city-select').value = cityId;
   document.getElementById('lede-text').textContent =
-    `Census tracts across ${city.coverage}. Coverage follows whole county boundaries, not city limits; explore all ${COUNTRY_VARS.length} listed birthplaces.`;
+    `Census tracts across ${city.coverage}. Coverage follows whole county boundaries, not city limits. All ${COUNTRY_VARS.length} listed birthplaces are available.`;
   enterCityMode(city);
 }
 
