@@ -689,6 +689,24 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading-msg { color: #9ca3af; font-size: 13px; }
     #loading-err { color: #f87171; font-size: 13px; text-align: center; max-width: 360px; line-height: 1.5; padding: 0 20px; }
+    #data-notice {
+      position: fixed; top: 12px; right: 12px; z-index: 2000;
+      max-width: 360px; padding: 12px 36px 12px 14px;
+      background: var(--surface-2); color: var(--text);
+      border: 1px solid #b45309; border-radius: 6px;
+      font-size: 12.5px; line-height: 1.5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    #data-notice[hidden] { display: none; }
+    #data-notice strong { color: #fbbf24; font-weight: 600; }
+    #data-notice button {
+      font: inherit; cursor: pointer; background: none; border: none; padding: 0;
+    }
+    #data-notice .reload { color: var(--accent); text-decoration: underline; }
+    #data-notice .close {
+      position: absolute; top: 8px; right: 10px;
+      color: var(--text-3); font-size: 16px; line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -697,6 +715,13 @@
   <div class="spinner"></div>
   <p id="loading-msg">Loading Census data...</p>
   <p id="loading-err" style="display:none"></p>
+</div>
+
+<div id="data-notice" role="status" hidden>
+  <strong>Some data didn't load,</strong> so these figures will show as blank or unavailable:
+  <span id="data-notice-text" style="display:block; margin: 6px 0"></span>
+  <button type="button" class="reload" onclick="location.reload()">Reload the page</button> to try again.
+  <button type="button" class="close" aria-label="Dismiss" onclick="this.parentElement.hidden = true">&times;</button>
 </div>
 
 <div id="app">
@@ -1680,13 +1705,43 @@ async function fetchJSON(url, tries = 4) {
   throw lastErr;
 }
 
+// When a file still fails after the retries, say so on the page instead of
+// leaving parts of the map quietly blank.
+const missingData = {};  // { Counties: [...], Neighborhoods: [...] }
+function joinList(items) {
+  return items.length < 2 ? items[0]
+    : items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+}
+function noteMissingData(scope, topics) {
+  const list = missingData[scope] = missingData[scope] || [];
+  topics.forEach(t => { if (!list.includes(t)) list.push(t); });
+  // Keep the item with its own "and" at the end so the list stays readable.
+  list.sort((x, y) => x.startsWith('mainland') - y.startsWith('mainland'));
+  const box = document.getElementById('data-notice-text');
+  box.textContent = '';
+  Object.entries(missingData).forEach(([sc, items]) => {
+    const line = document.createElement('span');
+    line.style.display = 'block';
+    line.textContent = `${sc}: ${joinList(items)}.`;
+    box.appendChild(line);
+  });
+  document.getElementById('data-notice').hidden = false;
+}
+function fetchOptionalJSON(url, scope, topics) {
+  return fetchJSON(url).catch(err => {
+    console.error(err);
+    noteMissingData(scope, topics);
+    return {};
+  });
+}
+
 async function loadCensusData() {
   // County base data is baked into a static file so the page no longer depends
   // on the live Census API (which now requires an API key). See bake_county_data.py.
   const [merged, suppData, yoeData] = await Promise.all([
     fetchJSON('county-base-data.json'),
-    fetchJSON('county-supp-data.json').catch(() => ({})),
-    fetchJSON('county-yoe-data.json').catch(() => ({})),
+    fetchOptionalJSON('county-supp-data.json', 'Counties', ['citizenship', 'margins of error', 'mainland China, Hong Kong and Taiwan counts']),
+    fetchOptionalJSON('county-yoe-data.json', 'Counties', ['year of arrival']),
   ]);
   countyYoeData = yoeData;
 
@@ -1859,7 +1914,8 @@ async function loadTractDataIfNeeded() {
   try {
     const [data, supp, topo] = await Promise.all([
       fetchJSON('city-tracts-data.json'),
-      fetchJSON('tract-supp-data.json').catch(() => ({})),
+      fetchOptionalJSON('tract-supp-data.json', 'Neighborhoods',
+        ['citizenship', 'margins of error', 'year of arrival', 'mainland China, Hong Kong and Taiwan counts']),
       fetchJSON('city-tracts.topojson'),
     ]);
     const normalized = {};
@@ -1910,7 +1966,13 @@ function switchToCity(cityId) {
 }
 
 async function enterCityMode(city) {
-  await loadTractDataIfNeeded();
+  try {
+    await loadTractDataIfNeeded();
+  } catch (err) {
+    console.error(err);
+    noteMissingData('Neighborhoods', ['the whole city-area map']);
+    return;
+  }
 
   // A newer selection may have arrived while the tract files were loading.
   if (geoLevel !== 'city' || currentCity !== city.id) return;
